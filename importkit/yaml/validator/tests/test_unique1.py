@@ -6,7 +6,7 @@
 ##
 
 
-from semantix.lang.yaml.validator.tests.base import SchemaTest, raises
+from semantix.utils.lang.yaml.validator.tests.base import SchemaTest, raises
 
 
 class TestUnique(SchemaTest):

@@ -8,8 +8,8 @@
 
 import os
 import yaml
-from semantix.lang import meta
-from semantix.lang.yaml import loader
+from semantix.utils.lang import meta
+from semantix.utils.lang.yaml import loader
 
 
 class YamlImportError(Exception):

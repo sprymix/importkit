@@ -7,9 +7,10 @@
 
 
 import os
-from semantix import lang
-from semantix.lang import meta
-from semantix.lang.yaml import loader
+
+from semantix.utils import lang
+from semantix.utils.lang import meta
+from semantix.utils.lang.yaml import loader
 from semantix.utils.type_utils import ClassFactory
 
 

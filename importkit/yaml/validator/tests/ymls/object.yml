@@ -10,7 +10,7 @@ type: map
 mapping:
     test1:
         type: map
-        object: semantix.lang.yaml.validator.tests.test_object.A
+        object: semantix.utils.lang.yaml.validator.tests.test_object.A
         mapping:
             name:
                 type: str
@@ -21,7 +21,7 @@ mapping:
 
     fail:
         type: map
-        object: semantix.lang.yaml.validator.tests.test_object.Bad
+        object: semantix.utils.lang.yaml.validator.tests.test_object.Bad
         mapping:
             name:
                 type: str
@@ -29,7 +29,7 @@ mapping:
 
     customvalidation:
         type: map
-        object: semantix.lang.yaml.validator.tests.test_object.CustomValidator
+        object: semantix.utils.lang.yaml.validator.tests.test_object.CustomValidator
         mapping:
             name:
                 type: str

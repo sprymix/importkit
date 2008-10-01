@@ -6,7 +6,7 @@
 ##
 
 
-%SCHEMA semantix.lang.yaml.tests.testdata.ambig_schema.AmbigSchema
+%SCHEMA semantix.utils.lang.yaml.tests.testdata.ambig_schema.AmbigSchema
 %NAME test
 ---
 aaa: bbb

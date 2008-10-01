@@ -12,7 +12,7 @@ import imp
 from importlib import abc
 import collections
 
-from semantix.lang.meta import LanguageMeta, DocumentContext
+from .meta import LanguageMeta, DocumentContext
 
 
 class ImportContext(str):

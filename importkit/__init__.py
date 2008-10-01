@@ -6,12 +6,11 @@
 ##
 
 
-from semantix.lang.meta import LanguageMeta
-from semantix.lang.meta import DocumentContext
-from semantix.lang.import_ import ImportContext
+from .meta import LanguageMeta, DocumentContext
+from .import_ import ImportContext
 
 # Import languages to register them
-import semantix.lang.yaml
+import semantix.utils.lang.yaml
 
 
 class SemantixLangLoaderError(Exception):

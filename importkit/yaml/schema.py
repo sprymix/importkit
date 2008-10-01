@@ -6,7 +6,7 @@
 ##
 
 
-from semantix.lang.yaml import validator
+from . import validator
 
 
 class YamlValidationError(Exception):
@@ -24,5 +24,5 @@ class Schema(Base):
             node.tags = [node.tag]
         else:
             node.tags.add(node.tag)
-        node.tag = 'tag:semantix.sprymix.com,2009/semantix/class/derive:semantix.lang.yaml.schema.Base'
+        node.tag = 'tag:semantix.sprymix.com,2009/semantix/class/derive:semantix.utils.lang.yaml.schema.Base'
         return node

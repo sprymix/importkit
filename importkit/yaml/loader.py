@@ -12,7 +12,7 @@ import importlib
 import functools
 import copy
 
-import semantix.lang.meta
+import semantix.utils.lang.meta
 from semantix.utils.type_utils import ClassFactory
 
 
@@ -201,12 +201,12 @@ class Constructor(yaml.constructor.Constructor):
         return result
 
     def _get_source_context(self, node, document_context):
-        start = semantix.lang.meta.SourcePoint(node.start_mark.line, node.start_mark.column,
+        start = semantix.utils.lang.meta.SourcePoint(node.start_mark.line, node.start_mark.column,
                                                node.start_mark.pointer)
-        end = semantix.lang.meta.SourcePoint(node.end_mark.line, node.end_mark.column,
+        end = semantix.utils.lang.meta.SourcePoint(node.end_mark.line, node.end_mark.column,
                                                node.end_mark.pointer)
 
-        context = semantix.lang.meta.SourceContext(node.start_mark.name, node.start_mark.buffer,
+        context = semantix.utils.lang.meta.SourceContext(node.start_mark.name, node.start_mark.buffer,
                                                    start, end, document_context)
         return context
 
@@ -245,10 +245,10 @@ class Constructor(yaml.constructor.Constructor):
 
     def construct_python_object(self, classname, node):
         cls = self._get_class_from_tag(classname, node, 'object')
-        if not issubclass(cls, semantix.lang.meta.Object):
+        if not issubclass(cls, semantix.utils.lang.meta.Object):
             raise yaml.constructor.ConstructorError(
                     "while constructing a Python object", node.start_mark,
-                    "expected %s to be a subclass of semantix.lang.meta.Object" % classname, node.start_mark)
+                    "expected %s to be a subclass of semantix.utils.lang.meta.Object" % classname, node.start_mark)
 
         context = self._get_source_context(node, self.document_context)
 

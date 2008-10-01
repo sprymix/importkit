@@ -8,8 +8,8 @@
 
 import yaml
 
-from semantix.lang.meta import Object, ObjectError
-from semantix.lang.yaml.validator.tests.base import SchemaTest, result, raises
+from semantix.utils.lang.meta import Object, ObjectError
+from semantix.utils.lang.yaml.validator.tests.base import SchemaTest, result, raises
 
 
 class A(Object):
