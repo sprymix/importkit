@@ -17,7 +17,12 @@ class YamlReader(object):
         for line in buffer:
             if line.startswith('#') or line.startswith('%'):
                 if line.startswith('#!SCHEMA'):
-                    schema = line[10:-2]
+                    match = re.match(r"""
+                                        \#\!SCHEMA
+                                            \s '(?P<filename>.*)'
+                                      """, line, re.X)
+
+                    schema = match.group('filename')
 
                 if line.startswith('#!INCLUDE'):
                     match = re.match(r"""
