@@ -16,38 +16,48 @@ class YamlReader(object):
 
         for line in buffer:
             if line.startswith('#') or line.startswith('%'):
-                if line.startswith('#!SCHEMA'):
-                    match = re.match(r"""
-                                        \#\!SCHEMA
-                                            \s '(?P<filename>.*)'
-                                      """, line, re.X)
+                if line.startswith('#!'):
+                    if line.startswith('#!SCHEMA'):
+                        match = re.match(r"""
+                                            \#\!SCHEMA
+                                                \s '(?P<filename>.*)'
+                                          """, line, re.X)
 
-                    schema = match.group('filename')
+                        if match:
+                            schema = match.group('filename')
+                        else:
+                            raise YamlReaderError('cannot parse #!SCHEMA directive, line: "%s"' % line)
 
-                if line.startswith('#!INCLUDE'):
-                    match = re.match(r"""
-                                        \#\!INCLUDE
-                                            \s '(?P<filename>.*)'
-                                            \s \(
-                                                (?P<sections>.*)
-                                               \)
-                                      """, line, re.X)
 
-                    if match:
-                        chunks = {}
-                        fn = YamlReader._get_path(filename, match.group('filename'))
+                    elif line.startswith('#!INCLUDE'):
+                        match = re.match(r"""
+                                            \#\!INCLUDE
+                                                \s '(?P<filename>.*)'
+                                                \s \(
+                                                    (?P<sections>.*)
+                                                   \)
+                                          """, line, re.X)
 
-                        parts = YamlReader.read(fn)
+                        if match:
+                            chunks = {}
+                            fn = YamlReader._get_path(filename, match.group('filename'))
 
-                        for section in match.group('sections').split(','):
-                            section = section.strip()
+                            parts = YamlReader.read(fn)
 
-                            if section in parts:
-                                chunks[section] = parts[section]
-                            else:
-                                raise YamlReaderError('cannot find section "%s" in file: %s' % (section, fn))
+                            for section in match.group('sections').split(','):
+                                section = section.strip()
 
-                        result = helper.merge_dicts(result, chunks)
+                                if section in parts:
+                                    chunks[section] = parts[section]
+                                else:
+                                    raise YamlReaderError('cannot find section "%s" in file: %s' % (section, fn))
+
+                            result = helper.merge_dicts(result, chunks)
+                        else:
+                            raise YamlReaderError('cannot parse #!INCLUDE directive, line: "%s"' % line)
+
+                    else:
+                        raise YamlReaderError('unknown compiler directive, line: "%s"' % line)
 
             else:
                 break
