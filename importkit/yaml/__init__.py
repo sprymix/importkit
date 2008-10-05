@@ -66,7 +66,7 @@ class YamlReader(object):
             schema = YamlReader._get_path(filename, schema)
             output = os.popen('kwalify -lf ' + schema + ' ' + os.path.abspath(filename)).read()
 
-            if output.find('INVALID') >= 0:
+            if output.find('INVALID') >= 0 or output.find('ERROR') >= 0:
                 raise YamlValidationError('Failed to validate file: %s\n\nValidator output: \n%s' %
                                                (os.path.abspath(filename), output))
 
