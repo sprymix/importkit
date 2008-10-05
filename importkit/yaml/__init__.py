@@ -44,8 +44,16 @@ class YamlReader(object):
 
                             parts = YamlReader.read(fn)
 
-                            for section in match.group('sections').split(','):
+                            sections = match.group('sections').split(',')
+                            for section in sections:
                                 section = section.strip()
+
+                                if section == '*':
+                                    if len(sections) == 1:
+                                        chunks = parts
+                                        break
+                                    else:
+                                        raise YamlReaderError('invalid "*" use, line: %s' % line)
 
                                 if section in parts:
                                     chunks[section] = parts[section]
