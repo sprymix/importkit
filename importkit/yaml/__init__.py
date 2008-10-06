@@ -2,7 +2,7 @@ import yaml
 import re
 import os
 
-import semantix.helper as helper
+from ... import merge
 
 class YamlReaderError(Exception): pass
 class YamlValidationError(Exception): pass
@@ -60,7 +60,7 @@ class YamlReader(object):
                                 else:
                                     raise YamlReaderError('cannot find section "%s" in file: %s' % (section, fn))
 
-                            result = helper.merge_dicts(result, chunks)
+                            result = merge.merge_dicts(result, chunks)
                         else:
                             raise YamlReaderError('cannot parse #!INCLUDE directive, line: "%s"' % line)
 
@@ -78,7 +78,7 @@ class YamlReader(object):
                 raise YamlValidationError('Failed to validate file: %s\n\nValidator output: \n%s' %
                                                (os.path.abspath(filename), output))
 
-        return helper.merge_dicts(result, yaml.load(''.join(buffer)))
+        return merge.merge_dicts(result, yaml.load(''.join(buffer)))
 
     @staticmethod
     def _get_path(base_filename, rel_filename):

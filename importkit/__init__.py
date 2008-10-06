@@ -1,5 +1,7 @@
 from semantix.lib.readers.yaml import YamlReader
 
+__all__ = ['read']
+
 class SemantixReaderError(Exception): pass
 
 def read(filename):
