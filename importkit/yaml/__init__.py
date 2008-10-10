@@ -1,6 +1,7 @@
 import yaml
 import re
 import os
+import subprocess
 
 from ... import merge
 
@@ -72,11 +73,14 @@ class YamlReader(object):
 
         if schema:
             schema = YamlReader._get_path(filename, schema)
-            output = os.popen('kwalify -lf ' + schema + ' ' + os.path.abspath(filename)).read()
+            kwalify = subprocess.Popen(['kwalify', '-lf', schema, os.path.abspath(filename)],
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
+            (stdout, stderr) = kwalify.communicate()
 
-            if output.find('INVALID') >= 0 or output.find('ERROR') >= 0:
+            if stdout.find('INVALID') >= 0 or stderr.find('ERROR') >= 0:
                 raise YamlValidationError('Failed to validate file: %s\n\nValidator output: \n%s' %
-                                               (os.path.abspath(filename), output))
+                                               (os.path.abspath(filename), stderr + stdout))
 
         return merge.merge_dicts(result, yaml.load(''.join(buffer)))
 
