@@ -5,7 +5,14 @@ class Base(object):
     schema_file = ''
 
     @classmethod
-    def validate(cls, filename):
+    def validate(cls, meta):
+        if 'marshalled' in meta and meta['marshalled']:
+            return
+
+        cls.validatefile(meta['filename'])
+
+    @classmethod
+    def validatefile(cls, filename):
         kwalify = subprocess.Popen(['kwalify', '-lf', cls.schema_file, filename],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
