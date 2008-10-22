@@ -1,0 +1,12 @@
+type: seq
+sequence:
+    -
+        type: map
+        mapping:
+            "name":
+                type: str
+                length: { min: 2, max-ex: 20 }
+
+            "phone":
+                type: str
+                pattern: ^\d{3}-\d{3}-\d{4}$

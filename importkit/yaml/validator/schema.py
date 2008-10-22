@@ -15,7 +15,9 @@ class Schema(object):
         if dct_id in self.refs:
             return self.refs[dct_id]
 
-        if dct_type == 'map':
+        if dct_type == 'choice':
+            tp = types.ChoiceType(self)
+        elif dct_type == 'map':
             tp = types.MappingType(self)
         elif dct_type == 'seq':
             tp = types.SequenceType(self)

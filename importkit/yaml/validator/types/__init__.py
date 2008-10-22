@@ -1,5 +1,6 @@
 from .any import AnyType
 
+from .choice import ChoiceType
 from .map import MappingType
 from .seq import SequenceType
 

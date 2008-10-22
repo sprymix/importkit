@@ -1,0 +1,27 @@
+type: map
+mapping:
+    "constraints":
+        type: seq
+        sequence:
+            -
+                type: choice
+                choice:
+                    - type: map
+                      mapping:
+                        "expr":
+                            type: str
+
+                    - type: map
+                      mapping:
+                        "min-length":
+                            type: int
+
+                    - type: map
+                      mapping:
+                        "max-length":
+                            type: int
+
+                    - type: map
+                      mapping:
+                        "regexp":
+                            type: str
