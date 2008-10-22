@@ -4,20 +4,21 @@ import yaml
 from semantix.lib import validator, readers
 from .base import *
 
-class Tests(unittest.TestCase):
+class ChoiceTests(SchemaTest):
     def setUp(self):
-        self.schema = validator.Schema(readers.read('ymls/choice.yml'))
-
-    def load(self, str):
-        return yaml.load(str)
+        self.schema = self.get_schema('ymls/choice.yml')
 
     @failUnlessException(validator.SchemaValidationError, 'Choice block errors')
-    def test_root_sequence(self):
+    def test_validator_root_sequence(self):
         """
         constraints:
-            - exp1r: Hello World
+            - expr1: |
+                Hello World
             - regexp: ^test$
         """
+
+def suite():
+    return unittest.defaultTestLoader.loadTestsFromTestCase(ChoiceTests)
 
 if __name__ == '__main__':
     unittest.main()
