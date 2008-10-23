@@ -1,0 +1,9 @@
+type: map
+mapping:
+    int: { type: int }
+    float: { type: float }
+    number: { type: number }
+    text: { type: text }
+    any: { type: any }
+    str: { type: str }
+    bool: { type: bool }

@@ -4,9 +4,12 @@ from ..base import SchemaType
 from ...error import SchemaValidationError
 
 class SchemaScalarType(SchemaType):
+    __slots__ = ['unique']
+
     def load(self, dct):
         super(SchemaScalarType, self).load(dct)
-        self._init_constrainrs(('enum', 'range'), dct)
+        self._init_constrainrs(('enum', 'range', 'unique'), dct)
+        self.unique = None
 
     @staticmethod
     def check_range(range, data, repr=None, path=''):
@@ -33,6 +36,12 @@ class SchemaScalarType(SchemaType):
                 raise SchemaValidationError('range-max validation failed, value: "%s" > %s' %
                                             (repr, range['max-ex']), path)
 
+    def begin_checks(self):
+        self.unique = {}
+
+    def end_checks(self):
+        self.unique = None
+
     def check(self, data, path):
         super(SchemaScalarType, self).check(data, path)
 
@@ -43,6 +52,13 @@ class SchemaScalarType(SchemaType):
 
         if 'range' in self.constraints:
             SchemaScalarType.check_range(self.constraints['range'], data, data, path)
+
+        if 'unique' in self.constraints:
+            if data in self.unique:
+                raise SchemaValidationError('unique value "%s" is already used in %s' %
+                                            (data, self.unique[data]))
+
+            self.unique[data] = path
 
         return data
 

@@ -1,10 +1,17 @@
+import copy
+
 from .base import SchemaType
 from ..error import SchemaValidationError
 
 class MappingType(SchemaType):
+    __slots__ = ['keys', 'unique_base', 'unique']
+
     def __init__(self, schema):
         super(MappingType, self).__init__(schema)
         self.keys = {}
+
+        self.unique_base = {}
+        self.unique = None
 
     def load(self, dct):
         super(MappingType, self).load(dct)
@@ -13,11 +20,21 @@ class MappingType(SchemaType):
             self.keys[key] = {}
 
             self.keys[key]['required'] = 'required' in value and value['required']
+            self.keys[key]['unique'] = 'unique' in value and value['unique']
+
+            if self.keys[key]['unique']:
+                self.unique_base[key] = {}
+
             if 'default' in value:
                 self.keys[key]['default'] = value['default']
 
             self.keys[key]['type'] = self.schema._build(value)
 
+    def begin_checks(self):
+        self.unique = copy.deepcopy(self.unique_base)
+
+    def end_checks(self):
+        self.unique = None
 
     def check(self, data, path):
         super(MappingType, self).check(data, path)
@@ -28,9 +45,11 @@ class MappingType(SchemaType):
         any = '=' in self.keys
 
         for key, value in data.items():
+            conf_key = key
             if key in self.keys:
                 conf = self.keys[key]
             elif any:
+                conf_key = '='
                 conf = self.keys['=']
             else:
                 raise SchemaValidationError('unexpected key "%s"' % key, path)
@@ -39,7 +58,16 @@ class MappingType(SchemaType):
                 raise SchemaValidationError('None value for required key "%s"' % key, path)
 
             if value is not None:
+                conf['type'].begin_checks()
                 data[key] = conf['type'].check(value, path + '/' + key)
+                conf['type'].end_checks()
+
+            if conf['unique']:
+                if value in self.unique[conf_key]:
+                    raise SchemaValidationError('unique key "%s", value "%s" is already used in %s' %
+                                                (key, value, self.unique[conf_key][value]))
+
+                self.unique[conf_key][value] = path
 
         for key, conf in self.keys.items():
             if key == '=':

@@ -1,0 +1,17 @@
+type: map
+mapping:
+    test1:
+        type: seq
+        sequence:
+            -
+                type: str
+                unique: yes
+
+    test2:
+        type: seq
+        sequence:
+            -
+                type: int
+                enum: [1, 2, 3]
+                default: 1
+                unique: yes

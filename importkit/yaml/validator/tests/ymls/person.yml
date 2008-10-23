@@ -6,7 +6,14 @@ sequence:
             "name":
                 type: str
                 length: { min: 2, max-ex: 20 }
+                required: yes
+                unique: yes
 
             "phone":
                 type: str
                 pattern: ^\d{3}-\d{3}-\d{4}$
+
+            "sex":
+                type: str
+                enum: [male, female]
+                default: male

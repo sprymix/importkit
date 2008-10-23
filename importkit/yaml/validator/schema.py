@@ -50,4 +50,8 @@ class Schema(object):
             self.root = self._build(self.__dct)
             del self.__dct
 
-        return self.root.check(data, '')
+        self.root.begin_checks()
+        result = self.root.check(data, '')
+        self.root.end_checks()
+
+        return result

@@ -4,6 +4,8 @@ from .base import SchemaType
 from ..error import SchemaValidationError
 
 class ChoiceType(SchemaType):
+    __slots__ = ['choice']
+
     def __init__(self, schema):
         super(ChoiceType, self).__init__(schema)
         self.choice = None

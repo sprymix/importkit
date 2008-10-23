@@ -1,6 +1,8 @@
 from ..error import SchemaValidationError
 
 class SchemaType(object):
+    __slots__ = ['schema', 'constraints', 'dct']
+
     def __init__(self, schema):
         self.schema = schema
         self.constraints = {}
@@ -12,6 +14,12 @@ class SchemaType(object):
 
     def load(self, dct):
         self.dct = dct
+
+    def begin_checks(self):
+        pass
+
+    def end_checks(self):
+        pass
 
     def check(self, data, path):
         return data
