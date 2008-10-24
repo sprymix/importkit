@@ -1,7 +1,7 @@
-from .base import SchemaType
+from .composite import CompositeType
 from ..error import SchemaValidationError
 
-class SequenceType(SchemaType):
+class SequenceType(CompositeType):
     __slots__ = ['sequence_type']
 
     def __init__(self, schema):
@@ -15,6 +15,11 @@ class SequenceType(SchemaType):
 
     def check(self, data, path):
         super(SequenceType, self).check(data, path)
+
+        did = id(data)
+        if did in self.checked:
+            return data
+        self.checked[did] = True
 
         if not isinstance(data, list):
             raise SchemaValidationError('list expected', path)

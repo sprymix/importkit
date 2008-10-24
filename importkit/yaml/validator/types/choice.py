@@ -1,14 +1,15 @@
 import copy
 
-from .base import SchemaType
+from .composite import CompositeType
 from ..error import SchemaValidationError
 
-class ChoiceType(SchemaType):
+class ChoiceType(CompositeType):
     __slots__ = ['choice']
 
     def __init__(self, schema):
         super(ChoiceType, self).__init__(schema)
         self.choice = None
+        self.checked = {}
 
     def load(self, dct):
         super(ChoiceType, self).load(dct)
@@ -20,6 +21,11 @@ class ChoiceType(SchemaType):
 
     def check(self, data, path):
         super(ChoiceType, self).check(data, path)
+
+        did = id(data)
+        if did in self.checked:
+            return data
+        self.checked[did] = True
 
         errors = []
         tmp = None

@@ -1,9 +1,9 @@
 import copy
 
-from .base import SchemaType
+from .composite import CompositeType
 from ..error import SchemaValidationError
 
-class MappingType(SchemaType):
+class MappingType(CompositeType):
     __slots__ = ['keys', 'unique_base', 'unique']
 
     def __init__(self, schema):
@@ -31,13 +31,20 @@ class MappingType(SchemaType):
             self.keys[key]['type'] = self.schema._build(value)
 
     def begin_checks(self):
+        super(MappingType, self).begin_checks()
         self.unique = copy.deepcopy(self.unique_base)
 
     def end_checks(self):
+        super(MappingType, self).end_checks()
         self.unique = None
 
     def check(self, data, path):
         super(MappingType, self).check(data, path)
+
+        did = id(data)
+        if did in self.checked:
+            return data
+        self.checked[did] = True
 
         if not isinstance(data, dict):
             raise SchemaValidationError('mapping expected', path)
