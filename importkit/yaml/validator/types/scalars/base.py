@@ -27,13 +27,13 @@ class SchemaScalarType(SchemaType):
                                             (repr, range['min-ex']), path)
 
         if 'max' in range:
-            if data >= range['max']:
-                raise SchemaValidationError('range-max validation failed, value: "%s" >= %s' %
+            if data > range['max']:
+                raise SchemaValidationError('range-max validation failed, value: "%s" > %s' %
                                             (repr, range['max']), path)
 
         if 'max-ex' in range:
-            if data > range['max-ex']:
-                raise SchemaValidationError('range-max validation failed, value: "%s" > %s' %
+            if data >= range['max-ex']:
+                raise SchemaValidationError('range-max validation failed, value: "%s" >= %s' %
                                             (repr, range['max-ex']), path)
 
     def begin_checks(self):
