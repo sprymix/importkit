@@ -1,4 +1,4 @@
-from semantix.lib.validator import types, error
+from semantix.validator import types, error
 
 class Schema(object):
     def __init__(self, dct, resource_name=''):

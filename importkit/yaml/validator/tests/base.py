@@ -1,6 +1,6 @@
 import unittest, os, yaml
 
-from semantix.lib import validator, readers
+from semantix import validator, readers
 
 __all__ = ['failUnlessException', 'failUnlessResult', 'SchemaTest']
 

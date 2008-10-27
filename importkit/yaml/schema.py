@@ -1,5 +1,5 @@
 import subprocess
-from semantix.lib import validator
+from semantix import validator
 
 class YamlValidationError(Exception): pass
 class Base(object):

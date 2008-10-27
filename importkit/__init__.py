@@ -1,4 +1,4 @@
-from semantix.lib.readers.yaml.reader import YamlReader
+from semantix.readers.yaml.reader import YamlReader
 
 __all__ = ['read']
 

@@ -1,7 +1,7 @@
 import unittest
 import yaml
 
-from semantix.lib import validator, readers
+from semantix import validator, readers
 from .base import *
 
 class PersonTests(SchemaTest):
