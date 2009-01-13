@@ -3,7 +3,7 @@ import re
 import os
 import subprocess
 
-from ... import merge
+from semantix.utils import merge
 
 class YamlReaderError(Exception): pass
 class YamlReader(object):
