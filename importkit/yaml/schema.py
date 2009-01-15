@@ -11,7 +11,7 @@ class Base(object):
         if 'marshalled' in meta and meta['marshalled']:
             return
 
-        print 'validating >> ' + meta['filename']
+        print('validating >> ' + meta['filename'])
 
         return cls.schema.check(dct)
 

@@ -34,7 +34,7 @@ class ChoiceType(CompositeType):
             try:
                 tmp = copy.deepcopy(data)
                 tmp = choice.check(tmp, path)
-            except SchemaValidationError, error:
+            except SchemaValidationError as error:
                 errors.append(str(error))
             else:
                 break

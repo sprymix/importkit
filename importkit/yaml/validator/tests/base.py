@@ -12,7 +12,8 @@ def failUnlessException(ex_cls, ex_msg):
             error = None
             try:
                 slf.schema.check(slf.load(func.__doc__))
-            except ex_cls, error:
+            except ex_cls as ee:
+                error = ee
                 error = str(error)
 
             slf.failUnless(error is not None and ex_msg in error, 'expected error "%s" got "%s" instead' % (ex_msg, error))
@@ -27,7 +28,7 @@ def failUnlessResult(expected_result=None, key=None, value=None):
             error = None
             try:
                 result = slf.schema.check(slf.load(func.__doc__))
-            except Exception, error:
+            except Exception as error:
                 error = str(error)
             else:
                 if key is None:

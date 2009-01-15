@@ -25,7 +25,7 @@ class SequenceType(CompositeType):
             raise SchemaValidationError('list expected', path)
 
         self.sequence_type.begin_checks()
-        for i in xrange(0, len(data)):
+        for i in range(0, len(data)):
             data[i] = self.sequence_type.check(data[i], path + '/' + str(i))
         self.sequence_type.end_checks()
 

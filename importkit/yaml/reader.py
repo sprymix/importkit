@@ -9,7 +9,8 @@ class YamlReaderError(Exception): pass
 class YamlReader(object):
     @staticmethod
     def read(filename, return_meta=False):
-        buffer = file(filename).readlines()
+        with open(filename, 'r') as f:
+            buffer = f.readlines()
 
         result = {}
         meta = {}
