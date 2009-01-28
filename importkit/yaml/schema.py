@@ -8,10 +8,9 @@ class Base(object):
 
     @classmethod
     def validate(cls, meta, dct):
-        if 'marshalled' in meta and meta['marshalled']:
-            return
-
-        print('validating >> ' + meta['filename'])
+        #if 'marshalled' in meta and meta['marshalled']:
+        #    return
+        #print('validating >> ' + meta['filename'])
 
         return cls.schema.check(dct)
 
