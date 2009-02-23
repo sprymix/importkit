@@ -41,10 +41,12 @@ class MappingType(CompositeType):
     def check(self, data, path):
         super(MappingType, self).check(data, path)
 
+        """ XXX:
         did = id(data)
         if did in self.checked:
             return data
         self.checked[did] = True
+        """
 
         if not isinstance(data, dict):
             raise SchemaValidationError('mapping expected', path)
