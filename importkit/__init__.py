@@ -1,11 +1,10 @@
 from semantix.readers.yaml.reader import YamlReader
 
-__all__ = ['read']
+class SemantixReaderError(Exception):
+    pass
 
-class SemantixReaderError(Exception): pass
-
-def read(filename, return_meta = False):
+def read(filename):
     if filename.endswith('.yml'):
-        return YamlReader.read(filename, return_meta)
+        return YamlReader.read(filename)
 
-    raise SemantixReaderError('cannot read file:  %s' % filename)
+    raise SemantixReaderError('unable to read file:  %s' % filename)
