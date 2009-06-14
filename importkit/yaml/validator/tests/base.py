@@ -1,6 +1,7 @@
 import unittest, os, yaml
 
 from semantix import validator, readers
+from semantix.tests import SelectiveTestCase
 
 __all__ = ['failUnlessException', 'failUnlessResult', 'SchemaTest']
 
@@ -43,7 +44,7 @@ def failUnlessResult(expected_result=None, key=None, value=None):
         return new
     return dec
 
-class SchemaTest(unittest.TestCase):
+class SchemaTest(SelectiveTestCase):
     def load(self, str):
         return yaml.load(str)
 
