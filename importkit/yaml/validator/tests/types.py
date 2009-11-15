@@ -104,6 +104,24 @@ class TypesTests(SchemaTest):
         bool: 'yes'
         """
 
+    @failUnlessException(validator.SchemaValidationError, 'mapping expected')
+    def test_validator_types_map_fail1(self):
+        """
+        dict: 'WRONG'
+        """
+
+    @failUnlessException(validator.SchemaValidationError, 'unexpected key "wrongkey"')
+    def test_validator_types_map_fail2(self):
+        """
+        dict:
+            wrongkey: 1
+        """
+
+    @failUnlessResult(key='dict', value={'test1': 3, 'test2': 'a'})
+    def test_validator_types_map_defaults(self):
+        """
+        dict:
+        """
 
 def suite():
     return unittest.defaultTestLoader.loadTestsFromTestCase(TypesTests)

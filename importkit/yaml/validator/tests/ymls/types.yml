@@ -7,3 +7,12 @@ mapping:
     any: { type: any }
     str: { type: str }
     bool: { type: bool }
+    dict:
+        type: map
+        mapping:
+            test1:
+                type: int
+                default: 3
+            test2:
+                type: str
+                default: "a"

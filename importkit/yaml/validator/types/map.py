@@ -48,8 +48,11 @@ class MappingType(CompositeType):
         self.checked[did] = True
         """
 
-        if not isinstance(data, dict):
+        if not isinstance(data, dict) and data is not None:
             raise SchemaValidationError('mapping expected', path)
+
+        if data is None:
+            data = {}
 
         any = '=' in self.keys
 
@@ -66,10 +69,9 @@ class MappingType(CompositeType):
             if conf['required'] and value is None:
                 raise SchemaValidationError('None value for required key "%s"' % key, path)
 
-            if value is not None:
-                conf['type'].begin_checks()
-                data[key] = conf['type'].check(value, path + '/' + key)
-                conf['type'].end_checks()
+            conf['type'].begin_checks()
+            data[key] = conf['type'].check(value, path + '/' + key)
+            conf['type'].end_checks()
 
             if conf['unique']:
                 if value in self.unique[conf_key]:
