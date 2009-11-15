@@ -84,7 +84,7 @@ class MappingType(CompositeType):
 
             if key not in data:
                 if 'default' in conf:
-                    data[key] = conf['default']
+                    data[key] = self.coerse_value(conf['type'], conf['default'], path + '/#default')
 
             if key not in data:
                 if conf['required']:

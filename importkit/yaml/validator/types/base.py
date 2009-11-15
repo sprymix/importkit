@@ -26,3 +26,9 @@ class SchemaType(object):
 
     def is_bool(self, value):
         return (isinstance(value, str) and str == 'true' or str == 'yes') or bool(value)
+
+    def coerse_value(self, type, value, path):
+        if value == 'None':
+            return None
+        else:
+            return type.check(value, path)
