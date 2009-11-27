@@ -16,3 +16,11 @@ mapping:
             test2:
                 type: str
                 default: "a"
+
+    fdict:
+        type: map
+        min-length: 2
+        max-length: 3
+        mapping:
+            =:
+                type: str

@@ -16,6 +16,8 @@ class MappingType(CompositeType):
     def load(self, dct):
         super(MappingType, self).load(dct)
 
+        self._init_constrainrs(('max-length', 'min-length'), dct)
+
         for key, value in dct['mapping'].items():
             self.keys[key] = {}
 
@@ -53,6 +55,16 @@ class MappingType(CompositeType):
 
         if data is None:
             data = {}
+
+        if 'min-length' in self.constraints:
+            if len(data) < self.constraints['min-length']:
+                raise SchemaValidationError('the number of elements in mapping must not be less than %d'
+                                            % self.constraints['min-length'], path)
+
+        if 'max-length' in self.constraints:
+            if len(data) > self.constraints['max-length']:
+                raise SchemaValidationError('the number of elements in mapping must not exceed %d'
+                                            % self.constraints['max-length'], path)
 
         any = '=' in self.keys
 

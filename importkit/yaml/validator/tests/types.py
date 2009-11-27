@@ -81,13 +81,13 @@ class TypesTests(SchemaTest):
         """
 
     @failUnlessResult(key='bool', value=False)
-    def test_validator_types_bool_yes_result(self):
+    def test_validator_types_bool_yes_result2(self):
         """
         bool: no
         """
 
     @failUnlessResult(key='bool', value=False)
-    def test_validator_types_bool_True_result(self):
+    def test_validator_types_bool_True_result2(self):
         """
         bool: false
         """
@@ -122,6 +122,32 @@ class TypesTests(SchemaTest):
         """
         dict:
         """
+
+    @failUnlessException(validator.SchemaValidationError, 'the number of elements in mapping must not be less than 2')
+    def test_validator_types_map_constraints1(self):
+        """
+        fdict:
+            a: "1"
+        """
+
+    @failUnlessException(validator.SchemaValidationError, 'the number of elements in mapping must not exceed 3')
+    def test_validator_types_map_constraints2(self):
+        """
+        fdict:
+            a: "1"
+            b: "2"
+            c: "3"
+            d: "4"
+        """
+
+    @failUnlessResult(key='fdict', value={'a': "1", 'b': "2"})
+    def test_validator_types_map_constraints_ok(self):
+        """
+        fdict:
+            a: "1"
+            b: "2"
+        """
+
 
 def suite():
     return unittest.defaultTestLoader.loadTestsFromTestCase(TypesTests)
