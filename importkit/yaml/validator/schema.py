@@ -1,4 +1,4 @@
-from semantix.validator import types, error
+from semantix.lang.yaml.validator import types, error
 
 class Schema(object):
     @classmethod

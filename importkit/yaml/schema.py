@@ -1,4 +1,4 @@
-from semantix import validator
+from semantix.lang.yaml import validator
 
 
 class YamlValidationError(Exception):

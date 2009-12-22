@@ -1,4 +1,5 @@
-from semantix.validator.tests.base import SchemaTest, validator, raises, result
+from semantix.lang.yaml import validator
+from semantix.lang.yaml.validator.tests.base import SchemaTest, raises, result
 
 
 class TestTypes(SchemaTest):
