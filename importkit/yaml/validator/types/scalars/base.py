@@ -1,4 +1,5 @@
 import re
+import yaml
 
 from ..base import SchemaType
 from ...error import SchemaValidationError
@@ -7,34 +8,37 @@ class SchemaScalarType(SchemaType):
     __slots__ = ['unique']
 
     def load(self, dct):
-        super(SchemaScalarType, self).load(dct)
+        super().load(dct)
         self._init_constrainrs(('enum', 'range', 'unique'), dct)
         self.unique = None
 
     @staticmethod
-    def check_range(range, data, repr=None, path=''):
+    def check_range(range, node, repr=None):
         if repr is None:
-            repr = data
+            repr = node.value
+
+        value = SchemaScalarType.get_constructor().construct_object(node)
+        value = value if isinstance(value, int) else len(str(value))
 
         if 'min' in range:
-            if data <= range['min']:
+            if value < range['min']:
                 raise SchemaValidationError('range-min validation failed, value: "%s" <= %s' %
-                                            (repr, range['min']), path)
+                                            (repr, range['min']), node)
 
         if 'min-ex' in range:
-            if data < range['min-ex']:
+            if value <= range['min-ex']:
                 raise SchemaValidationError('range-min-ex validation failed, value: "%s" < %s' %
-                                            (repr, range['min-ex']), path)
+                                            (repr, range['min-ex']), node)
 
         if 'max' in range:
-            if data > range['max']:
+            if value > range['max']:
                 raise SchemaValidationError('range-max validation failed, value: "%s" > %s' %
-                                            (repr, range['max']), path)
+                                            (repr, range['max']), node)
 
         if 'max-ex' in range:
-            if data >= range['max-ex']:
-                raise SchemaValidationError('range-max validation failed, value: "%s" >= %s' %
-                                            (repr, range['max-ex']), path)
+            if value >= range['max-ex']:
+                raise SchemaValidationError('range-max-ex validation failed, value: "%s" >= %s' %
+                                            (repr, range['max-ex']), node)
 
     def begin_checks(self):
         self.unique = {}
@@ -42,40 +46,47 @@ class SchemaScalarType(SchemaType):
     def end_checks(self):
         self.unique = None
 
-    def check(self, data, path):
-        super(SchemaScalarType, self).check(data, path)
+    @classmethod
+    def get_constructor(cls):
+        constructor = getattr(cls, 'constructor', None)
+        if not constructor:
+            cls.constructor = yaml.constructor.Constructor()
+        return cls.constructor
+
+    def check(self, node):
+        super().check(node)
 
         if 'enum' in self.constraints:
-            if data not in self.constraints['enum']:
+            value = SchemaScalarType.get_constructor().construct_object(node)
+            if value not in self.constraints['enum']:
                 raise SchemaValidationError('enum validation failed, value: "%s" is not in %s' %
-                                            (data, self.constraints['enum']), path)
+                                            (value, self.constraints['enum']), node)
 
         if 'range' in self.constraints:
-            SchemaScalarType.check_range(self.constraints['range'], data, data, path)
+            SchemaScalarType.check_range(self.constraints['range'], node)
 
         if 'unique' in self.constraints:
-            if data in self.unique:
+            if node.value in self.unique:
                 raise SchemaValidationError('unique value "%s" is already used in %s' %
-                                            (data, self.unique[data]))
+                                            (node.value, self.unique[node.value]), node)
 
-            self.unique[data] = path
+            self.unique[node.value] = node
 
-        return data
-
+        return node
 
 class SchemaTextType(SchemaScalarType):
     def load(self, dct):
         super(SchemaTextType, self).load(dct)
         self._init_constrainrs(('pattern', 'length'), dct)
 
-    def check(self, data, path):
-        super(SchemaTextType, self).check(data, path)
+    def check(self, node):
+        super(SchemaTextType, self).check(node)
 
         if 'pattern' in self.constraints:
-            if re.match(self.constraints['pattern'], str(data)) is None:
-                raise SchemaValidationError('pattern validation failed, value: "%s"' % data, path)
+            if re.match(self.constraints['pattern'], str(node.value)) is None:
+                raise SchemaValidationError('pattern validation failed, value: "%s"' % node.value, node)
 
         if 'length' in self.constraints:
-            SchemaScalarType.check_range(self.constraints['length'], len(str(data)), 'len("%s")' % data, path)
+            SchemaScalarType.check_range(self.constraints['length'], node, 'len("%s")' % node.value)
 
-        return data
+        return node

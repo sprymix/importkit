@@ -1,6 +1,7 @@
 import os
 import yaml
 from semantix import validator, readers
+from semantix.utils.type_utils import ClassFactory
 
 
 def raises(ex_cls, ex_msg):
@@ -8,15 +9,18 @@ def raises(ex_cls, ex_msg):
         def new(*args, **kwargs):
             slf = args[0]
 
-            error = None
             try:
-                slf.schema.check(slf.load(func.__doc__))
+                node = slf.load(func.__doc__)
+                slf.schema.check(node)
             except ex_cls as ee:
-                error = ee
-                error = str(error)
+                assert ex_msg in str(ee), \
+                       'expected error "%s" got "%s" instead' % (ex_msg, ee)
+            else:
+                assert False, 'expected error "%s" got None instead' % ex_msg
 
-            assert error is not None and ex_msg in error, \
-                   'expected error "%s" got "%s" instead' % (ex_msg, error)
+        new.__name__ = func.__name__
+        new.__doc__ = func.__doc__
+        new.__dict__.update(func.__dict__)
         return new
     return dec
 
@@ -26,11 +30,13 @@ def result(expected_result=None, key=None, value=None):
         def new(*args, **kwargs):
             slf = args[0]
 
-            error = None
+            constructor = yaml.constructor.Constructor()
             try:
-                result = slf.schema.check(slf.load(func.__doc__))
-            except Exception as error:
-                error = str(error)
+                node = slf.load(func.__doc__)
+                node = slf.schema.check(node)
+                result = constructor.construct_document(node)
+            except Exception:
+                raise
             else:
                 if key is None:
                     assert expected_result == result, \
@@ -39,15 +45,20 @@ def result(expected_result=None, key=None, value=None):
                     assert result[key] == value, \
                            'unexpected validation result %r, expected %r' % (result[key], value)
 
-            assert error is None, 'unexpected error: ' + str(error)
+        new.__name__ = func.__name__
+        new.__doc__ = func.__doc__
+        new.__dict__.update(func.__dict__)
         return new
     return dec
 
 
 class SchemaTest(object):
     def load(self, str):
-        return yaml.load(str)
+        return yaml.compose(str)
 
     @staticmethod
     def get_schema(file):
-        return validator.Schema(readers.read(os.path.join(os.path.dirname(__file__), file)))
+        schema = ClassFactory(file, (validator.Schema,), {})
+        schema_data = readers.read(os.path.join(os.path.dirname(__file__), file))
+        schema.init_class(next(schema_data)[1])
+        return schema()

@@ -24,3 +24,7 @@ mapping:
         mapping:
             =:
                 type: str
+
+    minmax:
+        type: int
+        range: {min: 3, max-ex: 20}

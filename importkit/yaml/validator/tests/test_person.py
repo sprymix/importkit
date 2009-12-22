@@ -20,7 +20,7 @@ class TestPerson(SchemaTest):
           phone: 416-509-280
         """
 
-    @raises(validator.SchemaValidationError, 'range-max validation failed')
+    @raises(validator.SchemaValidationError, 'range-max-ex validation failed')
     def test_validator_range_max(self):
         """
         - name: "123456789012345678901"

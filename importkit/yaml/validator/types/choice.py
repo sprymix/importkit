@@ -4,27 +4,27 @@ from .composite import CompositeType
 from ..error import SchemaValidationError
 
 class ChoiceType(CompositeType):
-    __slots__ = ['choice']
+    __slots__ = ['choice', 'checked']
 
     def __init__(self, schema):
-        super(ChoiceType, self).__init__(schema)
+        super().__init__(schema)
         self.choice = None
         self.checked = {}
 
     def load(self, dct):
-        super(ChoiceType, self).load(dct)
+        super().load(dct)
 
         self.choice = []
         for choice in dct['choice']:
             self.choice.append(self.schema._build(choice))
 
 
-    def check(self, data, path):
-        super(ChoiceType, self).check(data, path)
+    def check(self, node):
+        super().check(node)
 
-        did = id(data)
+        did = id(node)
         if did in self.checked:
-            return data
+            return node
         self.checked[did] = True
 
         errors = []
@@ -32,14 +32,15 @@ class ChoiceType(CompositeType):
 
         for choice in self.choice:
             try:
-                tmp = copy.deepcopy(data)
-                tmp = choice.check(tmp, path)
+                tmp = copy.deepcopy(node)
+                tmp = choice.check(tmp)
             except SchemaValidationError as error:
                 errors.append(str(error))
             else:
                 break
         else:
-            raise SchemaValidationError('Choice block errors:\n' + '\n'.join(errors), path)
+            raise SchemaValidationError('Choice block errors:\n' + '\n'.join(errors), node)
 
-        data = tmp
-        return data
+        node.value = tmp.value
+
+        return node

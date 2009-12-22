@@ -145,3 +145,21 @@ class TestTypes(SchemaTest):
             a: "1"
             b: "2"
         """
+
+    @result(key='minmax', value=3)
+    def test_validator_types_int_minmax(self):
+        """
+        minmax: 3
+        """
+
+    @raises(validator.SchemaValidationError, 'range-min validation failed')
+    def test_validator_types_int_minmax_fail(self):
+        """
+        minmax: 2
+        """
+
+    @raises(validator.SchemaValidationError, 'range-max-ex validation failed')
+    def test_validator_types_int_minmax_fail2(self):
+        """
+        minmax: 20
+        """

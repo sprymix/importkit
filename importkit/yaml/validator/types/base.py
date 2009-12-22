@@ -1,4 +1,4 @@
-from ..error import SchemaValidationError
+import yaml
 
 class SchemaType(object):
     __slots__ = ['schema', 'constraints', 'dct']
@@ -21,14 +21,15 @@ class SchemaType(object):
     def end_checks(self):
         pass
 
-    def check(self, data, path):
-        return data
+    def check(self, node):
+        return node
 
     def is_bool(self, value):
         return (isinstance(value, str) and str == 'true' or str == 'yes') or bool(value)
 
-    def coerse_value(self, type, value, path):
-        if value == 'None':
-            return None
+    def coerse_value(self, type, value, node):
+        # XXX: put proper check here
+        if value == 'None' or value is None:
+            return yaml.nodes.ScalarNode(value=None, tag='tag:yaml.org,2002:null')
         else:
-            return type.check(value, path)
+            return yaml.nodes.ScalarNode(value=value, tag='tag:yaml.org,2002:str')

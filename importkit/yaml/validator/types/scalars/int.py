@@ -2,8 +2,8 @@ from .base import SchemaScalarType
 from ...error import SchemaValidationError
 
 class IntType(SchemaScalarType):
-    def check(self, data, path):
-        if not isinstance(data, int):
-            raise SchemaValidationError('expected integer', path)
+    def check(self, node):
+        if node.tag != 'tag:yaml.org,2002:int':
+            raise SchemaValidationError('expected integer', node)
 
-        return super(IntType, self).check(data, path)
+        return super().check(node)

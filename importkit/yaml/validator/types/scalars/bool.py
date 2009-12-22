@@ -2,8 +2,8 @@ from ..base import SchemaType
 from ...error import SchemaValidationError
 
 class BoolType(SchemaType):
-    def check(self, data, path):
-        if not isinstance(data, bool):
-            raise SchemaValidationError('expected bool', path)
+    def check(self, node):
+        if node.tag != 'tag:yaml.org,2002:bool':
+            raise SchemaValidationError('expected bool', node)
 
-        return super(BoolType, self).check(data, path)
+        return super().check(node)

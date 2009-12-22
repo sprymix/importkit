@@ -1,3 +1,5 @@
+import yaml
+
 from .composite import CompositeType
 from ..error import SchemaValidationError
 
@@ -13,20 +15,23 @@ class SequenceType(CompositeType):
 
         self.sequence_type = self.schema._build(dct['sequence'][0])
 
-    def check(self, data, path):
-        super(SequenceType, self).check(data, path)
+    def check(self, node):
+        super(SequenceType, self).check(node)
 
-        did = id(data)
+        did = id(node)
         if did in self.checked:
-            return data
+            return node
         self.checked[did] = True
 
-        if not isinstance(data, list):
-            raise SchemaValidationError('list expected', path)
+        if not isinstance(node, yaml.nodes.SequenceNode):
+            raise SchemaValidationError('list expected', node)
 
         self.sequence_type.begin_checks()
-        for i in range(0, len(data)):
-            data[i] = self.sequence_type.check(data[i], path + '/' + str(i))
+        new_list = []
+        for i, value in enumerate(node.value):
+            new_list.append(self.sequence_type.check(value))
+
+        node.value = new_list
         self.sequence_type.end_checks()
 
-        return data
+        return node

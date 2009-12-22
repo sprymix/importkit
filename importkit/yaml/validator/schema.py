@@ -1,12 +1,13 @@
 from semantix.validator import types, error
 
 class Schema(object):
-    def __init__(self, dct, resource_name=''):
-        self.refs = {}
-        self.__dct = dct
-        self.root = None
-        self.resource_name = resource_name
+    @classmethod
+    def init_class(cls, data):
+        cls.__dct = data
 
+    def __init__(self):
+        self.refs = {}
+        self.root = None
 
     def _build(self, dct):
         dct_id = id(dct)
@@ -38,20 +39,17 @@ class Schema(object):
         else:
             raise error.SchemaError('unknown type: ' + dct_type)
 
-
         self.refs[dct_id] = tp
 
         tp.load(dct)
         return tp
 
-
-    def check(self, data):
+    def check(self, node):
         if self.root is None:
             self.root = self._build(self.__dct)
-            del self.__dct
 
         self.root.begin_checks()
-        result = self.root.check(data, '')
+        result = self.root.check(node)
         self.root.end_checks()
 
         return result
