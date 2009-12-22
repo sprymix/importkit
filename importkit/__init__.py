@@ -1,4 +1,4 @@
-from semantix.readers.yaml.reader import YamlReader
+from semantix.lang.yaml.reader import YamlReader
 
 
 class SemantixReaderError(Exception):

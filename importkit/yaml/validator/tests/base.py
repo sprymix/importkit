@@ -1,6 +1,6 @@
 import os
 import yaml
-from semantix import validator, readers
+from semantix import validator, lang
 from semantix.utils.type_utils import ClassFactory
 
 
@@ -59,6 +59,6 @@ class SchemaTest(object):
     @staticmethod
     def get_schema(file):
         schema = ClassFactory(file, (validator.Schema,), {})
-        schema_data = readers.read(os.path.join(os.path.dirname(__file__), file))
+        schema_data = lang.read(os.path.join(os.path.dirname(__file__), file))
         schema.init_class(next(schema_data)[1])
         return schema()

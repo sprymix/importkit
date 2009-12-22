@@ -7,7 +7,7 @@ class YamlValidationError(Exception):
 
 class Schema(object):
     def check(self, node):
-        node.tag = 'tag:semantix.sprymix.com,2009/semantix/class/derive:semantix.readers.yaml.schema.Base'
+        node.tag = 'tag:semantix.sprymix.com,2009/semantix/class/derive:semantix.lang.yaml.schema.Base'
         return node
 
 
