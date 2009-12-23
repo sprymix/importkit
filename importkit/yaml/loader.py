@@ -4,53 +4,45 @@ import importlib
 from semantix.utils.type_utils import ClassFactory
 
 class Scanner(yaml.scanner.Scanner):
+
+    def __init__(self):
+        super().__init__()
+        self.alnum_range = self.mcrange([('0', '9'), ('a', 'z'), ('A', 'Z')]) + ['_']
+
+    def mcrange(self, ranges):
+        result = []
+        for c1, c2 in ranges:
+            result.extend(self.crange(c1, c2))
+        return result
+
+    def crange(self, c1, c2):
+        return [chr(o) for o in range(ord(c1), ord(c2))]
+
     def scan_directive(self):
         start_mark = self.get_mark()
 
-        if self.prefix(7) == '%SCHEMA':
-            self.forward()
-            name = self.scan_directive_name(start_mark)
-            value = self.scan_schema_directive_value(start_mark)
-            end_mark = self.get_mark()
-            self.scan_directive_ignored_line(start_mark)
-            return yaml.tokens.DirectiveToken(name, value, start_mark, end_mark)
-        elif self.prefix(5) == '%NAME':
-            self.forward()
-            name = self.scan_directive_name(start_mark)
-            value = self.scan_name_directive_value(start_mark)
-            end_mark = self.get_mark()
-            self.scan_directive_ignored_line(start_mark)
-            return yaml.tokens.DirectiveToken(name, value, start_mark, end_mark)
+        directives = {
+            '%SCHEMA': self.alnum_range + ['.'],
+            '%NAME': self.alnum_range
+        }
+
+        for directive, charrange in directives.items():
+            if self.prefix(len(directive)) == directive:
+                self.forward()
+                name = self.scan_directive_name(start_mark)
+                value = self.scan_string(start_mark, charrange)
+                end_mark = self.get_mark()
+                self.scan_directive_ignored_line(start_mark)
+                return yaml.tokens.DirectiveToken(name, value, start_mark, end_mark)
         else:
             return super().scan_directive()
 
-    def scan_schema_directive_value(self, start_mark):
+    def scan_string(self, start_mark, allowed_range):
         while self.peek() == ' ':
             self.forward()
         length = 0
         ch = self.peek(length)
-        while '0' <= ch <= '9' or 'A' <= ch <= 'Z' or 'a' <= ch <= 'z' or ch in '-._':
-            length += 1
-            ch = self.peek(length)
-        if not length:
-            raise yaml.scanner.ScannerError("while scanning a directive", start_mark,
-                    "expected alphabetic or numeric character, but found %r"
-                    % ch, self.get_mark())
-        value = self.prefix(length)
-        self.forward(length)
-        ch = self.peek()
-        if ch not in '\0 \r\n\x85\u2028\u2029':
-            raise yaml.scanner.ScannerError("while scanning a directive", start_mark,
-                    "expected alphabetic or numeric character, but found %r"
-                    % ch, self.get_mark())
-        return value
-
-    def scan_name_directive_value(self, start_mark):
-        while self.peek() == ' ':
-            self.forward()
-        length = 0
-        ch = self.peek(length)
-        while '0' <= ch <= '9' or 'A' <= ch <= 'Z' or 'a' <= ch <= 'z' or ch in '-_':
+        while ch in allowed_range:
             length += 1
             ch = self.peek(length)
         if not length:
