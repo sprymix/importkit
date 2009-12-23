@@ -1,1 +1,1 @@
-from semantix.lang.yaml import reader
+from semantix.lang.yaml import loader

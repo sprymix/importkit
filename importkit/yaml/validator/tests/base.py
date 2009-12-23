@@ -59,6 +59,6 @@ class SchemaTest(object):
     @staticmethod
     def get_schema(file):
         schema = ClassFactory(file, (lang.yaml.validator.Schema,), {})
-        schema_data = lang.read(os.path.join(os.path.dirname(__file__), file))
+        schema_data = lang.load(os.path.join(os.path.dirname(__file__), file))
         schema.init_class(next(schema_data)[1])
         return schema()

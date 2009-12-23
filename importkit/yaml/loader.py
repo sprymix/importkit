@@ -170,11 +170,7 @@ Constructor.add_multi_constructor(
 )
 
 
-class YamlReaderError(Exception):
-    pass
-
-
-class Loader(yaml.reader.Reader, Scanner, Parser, Composer, Constructor, yaml.resolver.Resolver):
+class MyLoader(yaml.reader.Reader, Scanner, Parser, Composer, Constructor, yaml.resolver.Resolver):
     def __init__(self, stream):
         yaml.reader.Reader.__init__(self, stream)
         Scanner.__init__(self)
@@ -184,9 +180,8 @@ class Loader(yaml.reader.Reader, Scanner, Parser, Composer, Constructor, yaml.re
         yaml.resolver.Resolver.__init__(self)
 
 
-class YamlReader(object):
+class Loader(object):
     @staticmethod
-    def read(filename):
-        with open(filename, 'r') as f:
-            for d in yaml.load_all(f, Loader=Loader):
-                yield d
+    def load(stream):
+        for d in yaml.load_all(stream, Loader=MyLoader):
+            yield d

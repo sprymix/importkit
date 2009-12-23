@@ -1,12 +1,18 @@
 import yaml
-import semantix.lang.yaml.reader
+import semantix.lang.yaml.loader
 
-class SemantixReaderError(Exception):
+
+class SemantixLangLoaderError(Exception):
     pass
 
 
-def read(filename):
+def load(filename):
     if filename.endswith('.yml'):
-        return semantix.lang.yaml.reader.YamlReader.read(filename)
+        with open(filename) as f:
+            result = semantix.lang.yaml.loader.Loader.load(f)
+            for d in result:
+                yield d
 
-    raise SemantixReaderError('unable to read file:  %s' % filename)
+        return
+
+    raise SemantixLangLoaderError('unable to load file:  %s' % filename)
