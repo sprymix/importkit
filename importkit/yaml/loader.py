@@ -170,7 +170,7 @@ Constructor.add_multi_constructor(
 )
 
 
-class MyLoader(yaml.reader.Reader, Scanner, Parser, Composer, Constructor, yaml.resolver.Resolver):
+class Loader(yaml.reader.Reader, Scanner, Parser, Composer, Constructor, yaml.resolver.Resolver):
     def __init__(self, stream):
         yaml.reader.Reader.__init__(self, stream)
         Scanner.__init__(self)
@@ -178,10 +178,3 @@ class MyLoader(yaml.reader.Reader, Scanner, Parser, Composer, Constructor, yaml.
         Composer.__init__(self)
         Constructor.__init__(self)
         yaml.resolver.Resolver.__init__(self)
-
-
-class Loader(object):
-    @staticmethod
-    def load(stream):
-        for d in yaml.load_all(stream, Loader=MyLoader):
-            yield d
