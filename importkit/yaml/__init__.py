@@ -16,3 +16,10 @@ class Language(meta.Language):
     def load(cls, stream):
         for d in yaml.load_all(stream, Loader=loader.Loader):
             yield d
+
+
+    @classmethod
+    def load_dict(cls, stream):
+        ldr = loader.Loader(stream)
+        for d in ldr.get_dict():
+            yield d

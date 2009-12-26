@@ -1,0 +1,5 @@
+%SCHEMA semantix.lang.yaml.tests.test_import.DictImportSchema
+---
+attr1: test
+attr2: 1
+attr3: 4

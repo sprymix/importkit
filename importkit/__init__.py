@@ -46,7 +46,7 @@ class Importer(abc.Finder, abc.Loader):
 
         with open(filename) as stream:
             try:
-                attributes = language.load(stream)
+                attributes = language.load_dict(stream)
             except Exception as error:
                 raise ImportError('unable to import "%s" (%s)' % (fullname, error))
 

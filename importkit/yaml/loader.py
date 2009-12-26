@@ -4,6 +4,14 @@ import importlib
 import semantix.lang.meta
 from semantix.utils.type_utils import ClassFactory
 
+
+class AttributeMappingNode(yaml.nodes.MappingNode):
+    @classmethod
+    def from_map_node(cls, node):
+        return cls(tag=node.tag, value=node.value, start_mark=node.start_mark, end_mark=node.end_mark,
+                   flow_style=node.flow_style)
+
+
 class Scanner(yaml.scanner.Scanner):
 
     def __init__(self):
@@ -169,18 +177,17 @@ class Constructor(yaml.constructor.Constructor):
 
         return cls.construct(data, context)
 
-    def get_data(self):
+    def get_dict(self):
         # Construct and return the next document.
         if self.check_node():
             node = self.get_node()
-            return (node.document_name, self.construct_document(node))
+            data = self.construct_document(node)
 
-    def get_single_data(self):
-        # Ensure that the stream contains a single document and construct it.
-        node = self.get_single_node()
-        if node is not None:
-            return (node.document_name, self.construct_document(node))
-        return None
+            if isinstance(node, AttributeMappingNode):
+                for d in data.items():
+                    yield d
+            else:
+                yield (node.document_name, data)
 
 
 Constructor.add_multi_constructor(
