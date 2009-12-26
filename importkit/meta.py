@@ -18,3 +18,39 @@ class LanguageMeta(type):
 
 class Language(object, metaclass=LanguageMeta):
     pass
+
+
+class SourcePoint(object):
+    def __init__(self, line, column, pointer):
+        self.line = line
+        self.column = column
+        self.pointer = pointer
+
+
+class SourceContext(object):
+    def __init__(self, name, buffer, start, end):
+        self.name = name
+        self.buffer = buffer
+        self.start = start
+        self.end = end
+
+
+class ObjectError(Exception):
+    def __init__(self, msg, context=None, code=None, note=None):
+        self.msg = msg
+        self.context = context
+        self.code = code
+        self.note = note
+
+    def __str__(self):
+        return self.msg
+
+
+class Object(object):
+    @classmethod
+    def validate(cls, data, context):
+        pass
+
+    @classmethod
+    def construct(cls, data, context):
+        pass

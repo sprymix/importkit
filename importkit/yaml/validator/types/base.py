@@ -22,6 +22,11 @@ class SchemaType(object):
         pass
 
     def check(self, node):
+        if 'object' in self.dct:
+            if not hasattr(node, 'tags'):
+                node.tags = []
+            node.tags.append(node.tag)
+            node.tag = 'tag:semantix.sprymix.com,2009/semantix/object/create:' + self.dct['object']
         return node
 
     def is_bool(self, value):

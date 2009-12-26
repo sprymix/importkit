@@ -1,6 +1,7 @@
 import yaml
 import importlib
 
+import semantix.lang.meta
 from semantix.utils.type_utils import ClassFactory
 
 class Scanner(yaml.scanner.Scanner):
@@ -102,7 +103,6 @@ class Composer(yaml.composer.Composer):
         node = self.compose_node(None, None)
 
         schema = getattr(start_document, 'schema', None)
-
         if schema:
             module, obj = schema.rsplit('.', 1)
             module = importlib.import_module(module)
@@ -118,29 +118,56 @@ class Composer(yaml.composer.Composer):
 
 
 class Constructor(yaml.constructor.Constructor):
-    def construct_python_class(self, parent, node):
-        if not parent:
-            raise yaml.constructor.ConstructorError("while constructing a Python class", node.start_mark,
-                                                    "expected non-empty name appended to the tag", node.start_mark)
+    def _get_class_from_tag(self, clsname, node, intent='class'):
+        if not clsname:
+            raise yaml.constructor.ConstructorError("while constructing a Python %s" % intent, node.start_mark,
+                                                    "expected non-empty class name appended to the tag", node.start_mark)
 
-        module_name, class_name = parent.rsplit('.', 1)
+        module_name, class_name = clsname.rsplit('.', 1)
 
         try:
             module = importlib.import_module(module_name)
         except ImportError as exc:
-            raise yaml.constructor.ConstructorError("while constructing a Python class", node.start_mark,
+            raise yaml.constructor.ConstructorError("while constructing a Python %s" % intent, node.start_mark,
                                                     "could not find %r (%s)" % (module_name, exc), node.start_mark)
 
-        cls = getattr(module, class_name)
+        return getattr(module, class_name)
 
-        name = getattr(node, 'document_name', class_name + '_' + str(id(node)))
+    def _get_source_context(self, node):
+        start = semantix.lang.meta.SourcePoint(node.start_mark.line, node.start_mark.column,
+                                               node.start_mark.pointer)
+        end = semantix.lang.meta.SourcePoint(node.end_mark.line, node.end_mark.column,
+                                               node.end_mark.pointer)
+
+        context = semantix.lang.meta.SourceContext(node.start_mark.name, node.start_mark.buffer, start, end)
+        return context
+
+    def construct_python_class(self, parent, node):
+        cls = self._get_class_from_tag(parent, node, 'class')
+        name = getattr(node, 'document_name', cls.__name__ + '_' + str(id(node)))
         result = ClassFactory(name, (cls,), {})
-        result.__module__ = module_name
+        result.__module__ = cls.__module__
 
         data = self.construct_mapping(node, deep=True)
         result.init_class(data)
 
         return result
+
+    def construct_python_object(self, classname, node):
+        cls = self._get_class_from_tag(classname, node, 'object')
+        if not issubclass(cls, semantix.lang.meta.Object):
+            raise yaml.constructor.ConstructorError(
+                    "while constructing a Python object", node.start_mark,
+                    "expected %s to be a subclass of semantix.lang.meta.Object" % classname, node.start_mark)
+
+        node.tag = node.tags.pop()
+        del self.recursive_objects[node]
+        data = self.construct_object(node, True)
+        self.recursive_objects[node] = None
+
+        context = self._get_source_context(node)
+
+        return cls.construct(data, context)
 
     def get_data(self):
         # Construct and return the next document.
@@ -159,6 +186,11 @@ class Constructor(yaml.constructor.Constructor):
 Constructor.add_multi_constructor(
     'tag:semantix.sprymix.com,2009/semantix/class/derive:',
     Constructor.construct_python_class
+)
+
+Constructor.add_multi_constructor(
+    'tag:semantix.sprymix.com,2009/semantix/object/create:',
+    Constructor.construct_python_object
 )
 
 

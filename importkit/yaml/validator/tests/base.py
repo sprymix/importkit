@@ -1,6 +1,6 @@
 import os
-import yaml
 from semantix import lang
+from semantix.lang.yaml import loader
 from semantix.utils.type_utils import ClassFactory
 
 
@@ -9,9 +9,11 @@ def raises(ex_cls, ex_msg):
         def new(*args, **kwargs):
             slf = args[0]
 
+            constructor = loader.Constructor()
             try:
                 node = slf.load(func.__doc__)
-                slf.schema.check(node)
+                node = slf.schema.check(node)
+                constructor.construct_document(node)
             except ex_cls as ee:
                 assert ex_msg in str(ee), \
                        'expected error "%s" got "%s" instead' % (ex_msg, ee)
@@ -30,7 +32,7 @@ def result(expected_result=None, key=None, value=None):
         def new(*args, **kwargs):
             slf = args[0]
 
-            constructor = yaml.constructor.Constructor()
+            constructor = loader.Constructor()
             try:
                 node = slf.load(func.__doc__)
                 node = slf.schema.check(node)
@@ -54,7 +56,7 @@ def result(expected_result=None, key=None, value=None):
 
 class SchemaTest(object):
     def load(self, str):
-        return yaml.compose(str)
+        return loader.Loader(str).get_single_node()
 
     @staticmethod
     def get_schema(file):

@@ -3,6 +3,7 @@ import yaml
 from semantix.lang import meta
 from semantix.lang.yaml import loader
 
+
 class Language(meta.Language):
     @classmethod
     def recognize_file(cls, filename, try_append_extension=False):

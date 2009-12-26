@@ -42,7 +42,7 @@ class MappingType(CompositeType):
         self.unique = None
 
     def check(self, node):
-        super().check(node)
+        node = super().check(node)
 
         """ XXX:
         did = id(data)
