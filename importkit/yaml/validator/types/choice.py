@@ -42,5 +42,7 @@ class ChoiceType(CompositeType):
             raise SchemaValidationError('Choice block errors:\n' + '\n'.join(errors), node)
 
         node.value = tmp.value
+        node.tag = tmp.tag
+        node.tags = getattr(tmp, 'tags', None)
 
         return node

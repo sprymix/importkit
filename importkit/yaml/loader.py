@@ -8,8 +8,11 @@ from semantix.utils.type_utils import ClassFactory
 class AttributeMappingNode(yaml.nodes.MappingNode):
     @classmethod
     def from_map_node(cls, node):
-        return cls(tag=node.tag, value=node.value, start_mark=node.start_mark, end_mark=node.end_mark,
-                   flow_style=node.flow_style)
+        result = cls(tag=node.tag, value=node.value, start_mark=node.start_mark, end_mark=node.end_mark,
+                     flow_style=node.flow_style)
+        if hasattr(node, 'tags'):
+            result.tags = node.tags
+        return result
 
 
 class Scanner(yaml.scanner.Scanner):
