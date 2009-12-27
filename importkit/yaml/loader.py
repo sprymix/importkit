@@ -129,6 +129,10 @@ class Composer(yaml.composer.Composer):
 
 
 class Constructor(yaml.constructor.Constructor):
+    def __init__(self, context=None):
+        super().__init__()
+        self.loading_context = context
+
     def _get_class_from_tag(self, clsname, node, intent='class'):
         if not clsname:
             raise yaml.constructor.ConstructorError("while constructing a Python %s" % intent, node.start_mark,
@@ -144,13 +148,15 @@ class Constructor(yaml.constructor.Constructor):
 
         return getattr(module, class_name)
 
-    def _get_source_context(self, node):
+    def _get_source_context(self, node, loading_context):
         start = semantix.lang.meta.SourcePoint(node.start_mark.line, node.start_mark.column,
                                                node.start_mark.pointer)
         end = semantix.lang.meta.SourcePoint(node.end_mark.line, node.end_mark.column,
                                                node.end_mark.pointer)
 
-        context = semantix.lang.meta.SourceContext(node.start_mark.name, node.start_mark.buffer, start, end)
+        module = loading_context.module if loading_context is not None else None
+        context = semantix.lang.meta.SourceContext(node.start_mark.name, node.start_mark.buffer,
+                                                   start, end, module)
         return context
 
     def construct_python_class(self, parent, node):
@@ -176,7 +182,7 @@ class Constructor(yaml.constructor.Constructor):
         data = self.construct_object(node, True)
         self.recursive_objects[node] = None
 
-        context = self._get_source_context(node)
+        context = self._get_source_context(node, self.loading_context)
 
         return cls.construct(data, context)
 
@@ -205,10 +211,10 @@ Constructor.add_multi_constructor(
 
 
 class Loader(yaml.reader.Reader, Scanner, Parser, Composer, Constructor, yaml.resolver.Resolver):
-    def __init__(self, stream):
+    def __init__(self, stream, context=None):
         yaml.reader.Reader.__init__(self, stream)
         Scanner.__init__(self)
         Parser.__init__(self)
         Composer.__init__(self)
-        Constructor.__init__(self)
+        Constructor.__init__(self, context)
         yaml.resolver.Resolver.__init__(self)

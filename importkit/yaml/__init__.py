@@ -13,13 +13,20 @@ class Language(meta.Language):
             return filename
 
     @classmethod
-    def load(cls, stream):
-        for d in yaml.load_all(stream, Loader=loader.Loader):
-            yield d
+    def load(cls, stream, context=None):
+        if not context:
+            context = meta.LoadingContext()
+
+        ldr = loader.Loader(stream, context)
+        while ldr.check_data():
+            yield ldr.get_data()
 
 
     @classmethod
-    def load_dict(cls, stream):
-        ldr = loader.Loader(stream)
+    def load_dict(cls, stream, context=None):
+        if not context:
+            context = meta.LoadingContext()
+
+        ldr = loader.Loader(stream, context)
         for d in ldr.get_dict():
             yield d

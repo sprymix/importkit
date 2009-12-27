@@ -6,6 +6,9 @@ from importlib import abc
 import collections
 
 from semantix.lang.meta import LanguageMeta
+from semantix.lang.meta import LoadingContext
+
+# Import languages to register them
 import semantix.lang.yaml
 
 
@@ -47,9 +50,11 @@ class Importer(abc.Finder, abc.Loader):
 
         sys.modules[fullname] = new_mod
 
+        context = LoadingContext(module=new_mod)
+
         with open(filename) as stream:
             try:
-                attributes = language.load_dict(stream)
+                attributes = language.load_dict(stream, context=context)
             except Exception as error:
                 raise ImportError('unable to import "%s" (%s)' % (fullname, error))
 

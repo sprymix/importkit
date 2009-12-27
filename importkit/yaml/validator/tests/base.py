@@ -1,5 +1,6 @@
 import os
 from semantix import lang
+from semantix.lang import meta
 from semantix.lang.yaml import loader
 from semantix.utils.type_utils import ClassFactory
 
@@ -32,7 +33,7 @@ def result(expected_result=None, key=None, value=None):
         def new(*args, **kwargs):
             slf = args[0]
 
-            constructor = loader.Constructor()
+            constructor = loader.Constructor(context=meta.LoadingContext())
             try:
                 node = slf.load(func.__doc__)
                 node = slf.schema.check(node)
