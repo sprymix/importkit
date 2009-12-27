@@ -3,7 +3,7 @@ import sys
 import os
 import imp
 from importlib import abc
-
+import collections
 
 from semantix.lang.meta import LanguageMeta
 import semantix.lang.yaml
@@ -42,6 +42,9 @@ class Importer(abc.Finder, abc.Loader):
 
         new_mod = imp.new_module(fullname)
         setattr(new_mod, '__file__', filename)
+        setattr(new_mod, '__path__', os.path.dirname(filename))
+        setattr(new_mod, '__odict__', collections.OrderedDict())
+
         sys.modules[fullname] = new_mod
 
         with open(filename) as stream:
@@ -52,6 +55,7 @@ class Importer(abc.Finder, abc.Loader):
 
             for attribute_name, attribute_value in attributes:
                 if attribute_name:
+                    new_mod.__odict__[attribute_name] = attribute_value
                     setattr(new_mod, attribute_name, attribute_value)
 
         return new_mod
