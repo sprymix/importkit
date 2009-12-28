@@ -59,9 +59,9 @@ class Importer(abc.Finder, abc.Loader):
                 raise ImportError('unable to import "%s" (%s)' % (fullname, error))
 
             for attribute_name, attribute_value in attributes:
-                if attribute_name:
-                    new_mod.__odict__[attribute_name] = attribute_value
-                    setattr(new_mod, attribute_name, attribute_value)
+                attribute_name = str(attribute_name)
+                new_mod.__odict__[attribute_name] = attribute_value
+                setattr(new_mod, attribute_name, attribute_value)
 
         return new_mod
 
