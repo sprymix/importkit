@@ -71,7 +71,7 @@ class Scanner(yaml.scanner.Scanner):
         return value
 
     def push_tokens(self, tokens):
-        self.tokens.extend(tokens)
+        self.tokens[0:0] = tokens
 
 
 class Parser(yaml.parser.Parser):
