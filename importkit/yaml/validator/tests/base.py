@@ -33,7 +33,7 @@ def result(expected_result=None, key=None, value=None):
         def new(*args, **kwargs):
             slf = args[0]
 
-            constructor = loader.Constructor(context=meta.LoadingContext())
+            constructor = loader.Constructor(context=meta.DocumentContext())
             try:
                 node = slf.load(func.__doc__)
                 node = slf.schema.check(node)

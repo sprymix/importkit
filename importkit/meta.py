@@ -28,12 +28,12 @@ class SourcePoint(object):
 
 
 class SourceContext(object):
-    def __init__(self, name, buffer, start, end, module=None):
+    def __init__(self, name, buffer, start, end, document=None):
         self.name = name
         self.buffer = buffer
         self.start = start
         self.end = end
-        self.module = module
+        self.document = document
 
 
 class ObjectError(Exception):
@@ -57,6 +57,8 @@ class Object(object):
         pass
 
 
-class LoadingContext(object):
-    def __init__(self, module=None):
+class DocumentContext(object):
+    def __init__(self, module=None, import_context=None):
         self.module = module
+        self.import_context = import_context
+        self.imports = {}

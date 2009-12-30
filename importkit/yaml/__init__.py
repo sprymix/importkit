@@ -15,7 +15,7 @@ class Language(meta.Language):
     @classmethod
     def load(cls, stream, context=None):
         if not context:
-            context = meta.LoadingContext()
+            context = meta.DocumentContext()
 
         ldr = loader.Loader(stream, context)
         while ldr.check_data():
@@ -25,7 +25,7 @@ class Language(meta.Language):
     @classmethod
     def load_dict(cls, stream, context=None):
         if not context:
-            context = meta.LoadingContext()
+            context = meta.DocumentContext()
 
         ldr = loader.Loader(stream, context)
         for d in ldr.get_dict():

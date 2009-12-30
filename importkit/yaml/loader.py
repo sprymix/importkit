@@ -1,13 +1,24 @@
+import re
 import yaml
 import importlib
+import functools
 
 import semantix.lang.meta
 from semantix.utils.type_utils import ClassFactory
 
 
 class AttributeMappingNode(yaml.nodes.MappingNode):
+    """Mapping as an attribute dictionary indicator node.
+
+    A special YAML mapping node that is used to indicate that the mapping should
+    be used as an attribute dictionary.  The most common use is to turn the top-level
+    document mapping into module attributes.
+
+    """
+
     @classmethod
     def from_map_node(cls, node):
+        """Construct an AttributeMappingNode from a regular MappingNode"""
         result = cls(tag=node.tag, value=node.value, start_mark=node.start_mark, end_mark=node.end_mark,
                      flow_style=node.flow_style)
         if hasattr(node, 'tags'):
@@ -34,22 +45,23 @@ class Scanner(yaml.scanner.Scanner):
         start_mark = self.get_mark()
 
         directives = {
-            '%SCHEMA': self.alnum_range + ['.'],
-            '%NAME': self.alnum_range
+            '%SCHEMA': functools.partial(self.scan_string, self.alnum_range + ['.']),
+            '%NAME': functools.partial(self.scan_string, self.alnum_range),
+            '%IMPORT': functools.partial(self.scan_string, self.alnum_range + ['.', ',', ' ']),
         }
 
-        for directive, charrange in directives.items():
+        for directive, handler in directives.items():
             if self.prefix(len(directive)) == directive:
                 self.forward()
                 name = self.scan_directive_name(start_mark)
-                value = self.scan_string(start_mark, charrange)
+                value = handler(start_mark)
                 end_mark = self.get_mark()
                 self.scan_directive_ignored_line(start_mark)
                 return yaml.tokens.DirectiveToken(name, value, start_mark, end_mark)
         else:
             return super().scan_directive()
 
-    def scan_string(self, start_mark, allowed_range):
+    def scan_string(self, allowed_range, start_mark):
         while self.peek() == ' ':
             self.forward()
         length = 0
@@ -75,9 +87,15 @@ class Scanner(yaml.scanner.Scanner):
 
 
 class Parser(yaml.parser.Parser):
+    import_re = re.compile("""^(?P<import>(?P<module>\w+(?:\.\w+)*)(?:\s+AS\s+(?P<alias>\w+))?)
+                              (?P<tail>(?:\s*,\s*
+                                  (?:(?:\w+(?:\.\w+)*)(?:\s+AS\s+(?:\w+))?)
+                              )*)$""", re.X)
+
     def process_directives(self):
         self.schema = None
         self.document_name = None
+        self.imports = []
 
         rejected_tokens = []
 
@@ -91,6 +109,8 @@ class Parser(yaml.parser.Parser):
                 if self.document_name:
                     raise yaml.parser.ParserError(None, None, "duplicate NAME directive", token.start_mark)
                 self.document_name = token.value
+            elif token.name == 'IMPORT':
+                self.imports = self.parse_imports(token)
             else:
                 rejected_tokens.append(token)
 
@@ -103,8 +123,25 @@ class Parser(yaml.parser.Parser):
         if isinstance(event, yaml.events.DocumentStartEvent):
             event.schema = self.schema
             event.document_name = self.document_name
+            event.imports = self.imports
 
         return event
+
+    def parse_imports(self, token):
+        imports = {}
+
+        value = token.value
+        match = self.import_re.match(value)
+
+        if not match:
+            raise yaml.parser.ParserError(None, None, "invalid IMPORT directive syntax", token.start_mark)
+
+        while match:
+            imports[match.group('module')] = match.group('alias')
+            value = match.group('tail').strip(' ,')
+            match = self.import_re.match(value)
+
+        return imports
 
 
 class Composer(yaml.composer.Composer):
@@ -119,8 +156,10 @@ class Composer(yaml.composer.Composer):
             module = importlib.import_module(module)
             schema = getattr(module, obj)
             node = schema().check(node)
+            node.import_context = schema().get_import_context_class()
 
         node.document_name = getattr(start_document, 'document_name', None)
+        node.imports = getattr(start_document, 'imports', None)
 
         self.get_event()
         self.anchors = {}
@@ -131,7 +170,7 @@ class Composer(yaml.composer.Composer):
 class Constructor(yaml.constructor.Constructor):
     def __init__(self, context=None):
         super().__init__()
-        self.loading_context = context
+        self.document_context = context
 
     def _get_class_from_tag(self, clsname, node, intent='class'):
         if not clsname:
@@ -148,16 +187,32 @@ class Constructor(yaml.constructor.Constructor):
 
         return getattr(module, class_name)
 
-    def _get_source_context(self, node, loading_context):
+    def _get_source_context(self, node, document_context):
         start = semantix.lang.meta.SourcePoint(node.start_mark.line, node.start_mark.column,
                                                node.start_mark.pointer)
         end = semantix.lang.meta.SourcePoint(node.end_mark.line, node.end_mark.column,
                                                node.end_mark.pointer)
 
-        module = loading_context.module if loading_context is not None else None
         context = semantix.lang.meta.SourceContext(node.start_mark.name, node.start_mark.buffer,
-                                                   start, end, module)
+                                                   start, end, document_context)
         return context
+
+    def construct_document(self, node):
+        if node.imports:
+            for module_name, alias in node.imports.items():
+                try:
+                    if node.import_context:
+                        parent_context = self.document_context.import_context
+                        module_name = node.import_context.from_parent(module_name, parent=parent_context)
+                    mod = importlib.import_module(module_name)
+                except ImportError as e:
+                    raise yaml.constructor.ConstructorError(None, None, '%r' % e, node.start_mark)
+
+                if not alias:
+                    alias = mod
+                self.document_context.imports[alias] = mod
+
+        return super().construct_document(node)
 
     def construct_python_class(self, parent, node):
         cls = self._get_class_from_tag(parent, node, 'class')
@@ -182,7 +237,7 @@ class Constructor(yaml.constructor.Constructor):
         data = self.construct_object(node, True)
         self.recursive_objects[node] = None
 
-        context = self._get_source_context(node, self.loading_context)
+        context = self._get_source_context(node, self.document_context)
 
         return cls.construct(data, context)
 
