@@ -38,3 +38,6 @@ class SchemaType(object):
             return yaml.nodes.ScalarNode(value=None, tag='tag:yaml.org,2002:null')
         else:
             return yaml.nodes.ScalarNode(value=value, tag='tag:yaml.org,2002:str')
+
+    def check_tag(self, node, tag):
+        return node.tag == tag or hasattr(node, 'tags') and tag in node.tags
