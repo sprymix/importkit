@@ -90,3 +90,17 @@ class SchemaTextType(SchemaScalarType):
             SchemaScalarType.check_range(self.constraints['length'], node, 'len("%s")' % node.value)
 
         return node
+
+class ScalarType(SchemaScalarType):
+    scalar_tags = ['tag:yaml.org,2002:bool',
+                   'tag:yaml.org,2002:str',
+                   'tag:yaml.org,2002:int',
+                   'tag:yaml.org,2002:float']
+
+    def check(self, node):
+        super().check(node)
+
+        if node.tag not in self.scalar_tags:
+            raise SchemaValidationError('expected scalar, got %s' % node.tag, node)
+
+        return node

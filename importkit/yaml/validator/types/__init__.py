@@ -4,6 +4,7 @@ from .choice import ChoiceType
 from .map import MappingType
 from .seq import SequenceType
 
+from .scalars.base import ScalarType
 from .scalars.bool import BoolType
 
 from .scalars.text import TextType
