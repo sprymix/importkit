@@ -17,7 +17,6 @@ def load(filename):
             result = lang.load(f)
             for d in result:
                 yield d
-
         return
 
     raise SemantixLangLoaderError('unable to load file:  %s' % filename)

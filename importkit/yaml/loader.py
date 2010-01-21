@@ -2,9 +2,11 @@ import re
 import yaml
 import importlib
 import functools
+import copy
 
 import semantix.lang.meta
 from semantix.utils.type_utils import ClassFactory
+from semantix.utils.datastructures import OrderedSet
 
 
 class AttributeMappingNode(yaml.nodes.MappingNode):
@@ -220,10 +222,14 @@ class Constructor(yaml.constructor.Constructor):
         result = ClassFactory(name, (cls,), {})
         result.__module__ = cls.__module__
 
-        data = self.construct_mapping(node, deep=True)
+        nodecopy = copy.copy(node)
+        nodecopy.tag = nodecopy.tags.pop()
+
+        data = self.construct_object(nodecopy)
+
         result.init_class(data)
 
-        return result
+        yield result
 
     def construct_python_object(self, classname, node):
         cls = self._get_class_from_tag(classname, node, 'object')
@@ -232,14 +238,18 @@ class Constructor(yaml.constructor.Constructor):
                     "while constructing a Python object", node.start_mark,
                     "expected %s to be a subclass of semantix.lang.meta.Object" % classname, node.start_mark)
 
-        node.tag = node.tags.pop()
-        del self.recursive_objects[node]
-        data = self.construct_object(node, True)
-        self.recursive_objects[node] = None
-
         context = self._get_source_context(node, self.document_context)
 
-        return cls.construct(data, context)
+        nodecopy = copy.copy(node)
+        nodecopy.tag = nodecopy.tags.pop()
+
+        data = self.construct_object(nodecopy, True)
+
+        result = cls(context=context, data=data)
+
+        yield result
+
+        result.construct()
 
     def get_dict(self):
         # Construct and return the next document.

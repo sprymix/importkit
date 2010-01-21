@@ -48,12 +48,11 @@ class ObjectError(Exception):
 
 
 class Object(object):
-    @classmethod
-    def validate(cls, data, context):
-        pass
+    def __init__(self, context, data):
+        self.context = context
+        self.data = data
 
-    @classmethod
-    def construct(cls, data, context):
+    def construct(self):
         pass
 
 

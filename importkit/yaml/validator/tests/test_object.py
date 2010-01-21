@@ -5,16 +5,17 @@ from semantix.lang.yaml.validator.tests.base import SchemaTest, result, raises
 
 
 class A(Object):
-    def __init__(self, name, description):
+    def __init__(self, *, name=None, description=None, context=None, data=None):
+        super().__init__(context, data)
         self.name = name
         self.description = description
 
     def __eq__(self, other):
         return isinstance(other, A) and other.name == self.name and other.description == self.description
 
-    @classmethod
-    def construct(cls, data, context):
-        return cls(name=data['name'], description=data['description'])
+    def construct(self):
+        self.name = self.data['name']
+        self.description = self.data['description']
 
 
 class Bad(object):
@@ -22,19 +23,15 @@ class Bad(object):
 
 
 class CustomValidator(Object):
-    def __init__(self, name, description):
-        self.name = name
-        self.description = description
-
-    @classmethod
-    def construct(cls, data, context):
-        name = data['name']
-        description = data['description']
+    def construct(self):
+        name = self.data['name']
+        description = self.data['description']
 
         if name != description:
             raise ObjectError('name must be equal to description')
 
-        return cls(name=name, description=description)
+        self.name = name
+        self.description = description
 
 
 class TestObject(SchemaTest):
