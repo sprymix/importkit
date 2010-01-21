@@ -1,3 +1,4 @@
+import py
 from semantix.lang.yaml import validator
 from semantix.lang.yaml.validator.tests.base import SchemaTest, raises, result
 
@@ -7,6 +8,7 @@ class TestChoice(SchemaTest):
     def setup_class(cls):
         cls.schema = cls.get_schema('ymls/choice.yml')
 
+    @py.test.mark.skipif(True)
     @raises(validator.SchemaValidationError, 'Choice block errors')
     def test_validator_choice1(self):
         """
@@ -16,6 +18,7 @@ class TestChoice(SchemaTest):
             - regexp: ^test$
         """
 
+    @py.test.mark.skipif(True)
     @raises(validator.SchemaValidationError, 'expected string')
     def test_validator_choice2(self):
         """
