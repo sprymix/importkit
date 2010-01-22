@@ -68,7 +68,12 @@ class MappingType(CompositeType):
 
         any = '=' in self.keys
 
+        keys = set()
+
         for i, (key, value) in enumerate(node.value):
+            if key.value in keys:
+                raise SchemaValidationError('duplicate mapping key "%s"' % key.value, node)
+
             # TODO: support non-scalar keys
             conf_key = key.value
             if key.value in self.keys:
@@ -94,6 +99,7 @@ class MappingType(CompositeType):
                 self.unique[conf_key][value.value] = value
 
             node.value[i] = (key, value)
+            keys.add(key.value)
 
         value = {key.value: (key, value) for key, value in node.value}
 

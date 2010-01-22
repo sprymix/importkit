@@ -147,6 +147,14 @@ class TestTypes(SchemaTest):
             b: "2"
         """
 
+    @raises(validator.SchemaValidationError, 'duplicate mapping key "A"')
+    def test_validator_types_map_duplicate_key_check(self):
+        """
+        fdict:
+            A: "1"
+            A: "2"
+        """
+
     @result(key='minmax', value=3)
     def test_validator_types_int_minmax(self):
         """
