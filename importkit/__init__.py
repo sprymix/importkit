@@ -10,11 +10,11 @@ class SemantixLangLoaderError(Exception):
     pass
 
 
-def load(filename):
+def load(filename, context=None):
     (lang, filename) = LanguageMeta.recognize_file(filename)
     if lang:
         with open(filename) as f:
-            result = lang.load(f)
+            result = lang.load(f, context)
             for d in result:
                 yield d
         return

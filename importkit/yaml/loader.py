@@ -6,7 +6,6 @@ import copy
 
 import semantix.lang.meta
 from semantix.utils.type_utils import ClassFactory
-from semantix.utils.datastructures import OrderedSet
 
 
 class AttributeMappingNode(yaml.nodes.MappingNode):
@@ -183,11 +182,12 @@ class Constructor(yaml.constructor.Constructor):
 
         try:
             module = importlib.import_module(module_name)
-        except ImportError as exc:
+            result = getattr(module, class_name)
+        except (ImportError, AttributeError) as exc:
             raise yaml.constructor.ConstructorError("while constructing a Python %s" % intent, node.start_mark,
-                                                    "could not find %r (%s)" % (module_name, exc), node.start_mark)
+                                                    "could not find %r (%s)" % (clsname, exc), node.start_mark)
 
-        return getattr(module, class_name)
+        return result
 
     def _get_source_context(self, node, document_context):
         start = semantix.lang.meta.SourcePoint(node.start_mark.line, node.start_mark.column,
@@ -223,6 +223,7 @@ class Constructor(yaml.constructor.Constructor):
         result.__module__ = cls.__module__
 
         nodecopy = copy.copy(node)
+        nodecopy.tags = copy.copy(nodecopy.tags)
         nodecopy.tag = nodecopy.tags.pop()
 
         data = self.construct_object(nodecopy)
@@ -241,6 +242,7 @@ class Constructor(yaml.constructor.Constructor):
         context = self._get_source_context(node, self.document_context)
 
         nodecopy = copy.copy(node)
+        nodecopy.tags = copy.copy(nodecopy.tags)
         nodecopy.tag = nodecopy.tags.pop()
 
         data = self.construct_object(nodecopy, True)

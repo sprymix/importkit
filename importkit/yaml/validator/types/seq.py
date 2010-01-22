@@ -18,10 +18,12 @@ class SequenceType(CompositeType):
     def check(self, node):
         super(SequenceType, self).check(node)
 
+        """ XXX:
         did = id(node)
         if did in self.checked:
             return node
         self.checked[did] = True
+        """
 
         if not isinstance(node, yaml.nodes.SequenceNode):
             raise SchemaValidationError('list expected', node)
