@@ -8,9 +8,6 @@ from semantix.lang.meta import LanguageMeta, DocumentContext
 
 
 class ImportContext(str):
-    def __init__(self, *args, **kwargs):
-        super().__init__()
-
     def __getitem__(self, key):
         result = super().__getitem__(key)
         return self.__class__.copy(result, self)
@@ -21,10 +18,6 @@ class ImportContext(str):
 
     @classmethod
     def from_parent(cls, name, parent):
-        return cls(name)
-
-    @classmethod
-    def construct(cls, name):
         return cls(name)
 
 
