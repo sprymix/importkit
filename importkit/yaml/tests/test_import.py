@@ -1,3 +1,11 @@
+##
+# Copyright (c) 2008-2010 Sprymix Inc.
+# All rights reserved.
+#
+# See LICENSE for details.
+##
+
+
 import importlib
 from semantix.lang.yaml.loader import AttributeMappingNode
 from semantix.lang.yaml.schema import Schema

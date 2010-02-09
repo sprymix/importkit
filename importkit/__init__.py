@@ -1,3 +1,11 @@
+##
+# Copyright (c) 2008-2010 Sprymix Inc.
+# All rights reserved.
+#
+# See LICENSE for details.
+##
+
+
 from semantix.lang.meta import LanguageMeta
 from semantix.lang.meta import DocumentContext
 from semantix.lang.import_ import ImportContext

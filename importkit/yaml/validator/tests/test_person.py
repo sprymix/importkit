@@ -1,3 +1,11 @@
+##
+# Copyright (c) 2008-2010 Sprymix Inc.
+# All rights reserved.
+#
+# See LICENSE for details.
+##
+
+
 from semantix.lang.yaml import validator
 from semantix.lang.yaml.validator.tests.base import SchemaTest, raises, result
 
