@@ -12,10 +12,16 @@ from semantix.lang import meta
 from semantix.lang.yaml import loader
 
 
+class YamlImportError(Exception):
+    pass
+
+
 class Language(meta.Language):
     @classmethod
     def recognize_file(cls, filename, try_append_extension=False):
         if try_append_extension and os.path.exists(filename + '.yml'):
+            if os.path.exists(filename + '.py'):
+                raise YamlImportError('ambiguous yaml module name')
             return filename + '.yml'
         elif os.path.exists(filename) and filename.endswith('.yml'):
             return filename
