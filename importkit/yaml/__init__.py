@@ -41,6 +41,8 @@ class Language(meta.Language):
         if not context:
             context = meta.DocumentContext()
 
+        document_number = getattr(context.import_context, 'private', 0)
+
         ldr = loader.Loader(stream, context)
-        for d in ldr.get_dict():
+        for d in ldr.get_dict(document_number):
             yield d
