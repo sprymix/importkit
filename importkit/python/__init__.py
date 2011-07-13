@@ -7,12 +7,12 @@
 
 
 import os
-from importlib._bootstrap import _PyPycFileLoader
+from importlib._bootstrap import _SourceFileLoader
 
 from semantix.utils.lang import meta
 
 
-class Loader(_PyPycFileLoader):
+class Loader(_SourceFileLoader):
     pass
 
 
