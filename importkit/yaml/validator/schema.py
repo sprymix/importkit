@@ -6,43 +6,29 @@
 ##
 
 
+from yaml import constructor as std_yaml_constructor
+
 from semantix.utils.lang.import_ import get_object
 
+from semantix.utils.lang.yaml import constructor as yaml_constructor
 from . import types, error
 
-class Schema(object):
-    @classmethod
-    def prepare_class(cls, context, data):
-        cls.__dct = data
-        cls._context = context
 
-    def __init__(self):
+class SimpleSchema:
+    _schema_data = None
+
+    def __init__(self, schema_data=None):
         self.refs = {}
         self.root = None
+        if schema_data is None:
+            schema_data = self.__class__._schema_data
+        self._schema_data = schema_data
 
     def _build(self, dct):
         dct_id = id(dct)
 
         if dct_id in self.refs:
             return self.refs[dct_id]
-
-        if isinstance(dct, type) and issubclass(dct, Schema):
-            # This happens when top-level anchor is assigned to the schema
-            dct = dct.__dct
-
-        elif isinstance(dct, str):
-            imported_schema = self._get_imported_schema(dct)
-            dct = imported_schema.__dct
-
-        elif dct.get('extends'):
-            imported_schema = self._get_imported_schema(dct['extends'])()
-
-            imported_schema._build(imported_schema.__dct)
-            self.refs.update(imported_schema.refs)
-
-            _dct = imported_schema.__dct.copy()
-            _dct.update(dct)
-            dct = _dct
 
         dct_type = dct['type']
 
@@ -82,21 +68,9 @@ class Schema(object):
         tp.load(dct)
         return tp
 
-    def _get_imported_schema(self, schema_name):
-        # Reference to an external schema
-        head, _, tail = schema_name.partition('.')
-
-        imported = self.__class__._context.document.imports.get(head)
-        if imported:
-            head = imported.__name__
-
-        schema = get_object(head + '.' + tail)
-
-        return schema
-
     def check(self, node):
         if self.root is None:
-            self.root = self._build(self.__dct)
+            self.root = self._build(self._schema_data)
 
         self.root.begin_checks()
         result = self.root.check(node)
@@ -112,3 +86,60 @@ class Schema(object):
         node.tag = tag
 
         return tag
+
+    def init_constructor(self):
+        return std_yaml_constructor.Constructor()
+
+    def get_constructor(self):
+        constructor = getattr(self, 'constructor', None)
+        if not constructor:
+            self.constructor = self.init_constructor()
+        return self.constructor
+
+
+class Schema(SimpleSchema):
+    @classmethod
+    def prepare_class(cls, context, data):
+        cls._schema_data = data
+        cls._context = context
+
+    def init_constructor(self):
+        return yaml_constructor.Constructor()
+
+    def _build(self, dct):
+        dct_id = id(dct)
+
+        if dct_id in self.refs:
+            return self.refs[dct_id]
+
+        if isinstance(dct, type) and issubclass(dct, Schema):
+            # This happens when top-level anchor is assigned to the schema
+            dct = dct._schema_data
+
+        elif isinstance(dct, str):
+            imported_schema = self._get_imported_schema(dct)
+            dct = imported_schema._schema_data
+
+        elif dct.get('extends'):
+            imported_schema = self._get_imported_schema(dct['extends'])()
+
+            imported_schema._build(imported_schema._schema_data)
+            self.refs.update(imported_schema.refs)
+
+            _dct = imported_schema._schema_data.copy()
+            _dct.update(dct)
+            dct = _dct
+
+        return super()._build(dct)
+
+    def _get_imported_schema(self, schema_name):
+        # Reference to an external schema
+        head, _, tail = schema_name.partition('.')
+
+        imported = self.__class__._context.document.imports.get(head)
+        if imported:
+            head = imported.__name__
+
+        schema = get_object(head + '.' + tail)
+
+        return schema
