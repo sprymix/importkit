@@ -1,5 +1,5 @@
 ##
-# Copyright (c) 2008-2010 Sprymix Inc.
+# Copyright (c) 2008-2010, 2012 Sprymix Inc.
 # All rights reserved.
 #
 # See LICENSE for details.
@@ -8,9 +8,9 @@
 
 import re
 
-from semantix.utils.lang.yaml import constructor as yaml_constructor
 from ..base import SchemaType
 from ...error import SchemaValidationError
+
 
 class SchemaScalarType(SchemaType):
     __slots__ = ['unique']
@@ -20,12 +20,11 @@ class SchemaScalarType(SchemaType):
         self._init_constrainrs(('enum', 'range', 'unique'), dct)
         self.unique = None
 
-    @staticmethod
-    def check_range(range, node, repr=None):
+    def check_range(self, range, node, repr=None):
         if repr is None:
             repr = node.value
 
-        value = SchemaScalarType.get_constructor().construct_object(node)
+        value = self.schema.get_constructor().construct_object(node)
         value = value if isinstance(value, int) else len(str(value))
 
         if 'min' in range:
@@ -54,24 +53,17 @@ class SchemaScalarType(SchemaType):
     def end_checks(self):
         self.unique = None
 
-    @classmethod
-    def get_constructor(cls):
-        constructor = getattr(cls, 'constructor', None)
-        if not constructor:
-            cls.constructor = yaml_constructor.Constructor()
-        return cls.constructor
-
     def check(self, node):
         super().check(node)
 
         if 'enum' in self.constraints:
-            value = SchemaScalarType.get_constructor().construct_object(node)
+            value = self.schema.get_constructor().construct_object(node)
             if value not in self.constraints['enum']:
                 raise SchemaValidationError('enum validation failed, value: "%s" is not in %s' %
                                             (value, self.constraints['enum']), node)
 
         if 'range' in self.constraints:
-            SchemaScalarType.check_range(self.constraints['range'], node)
+            self.check_range(self.constraints['range'], node)
 
         if 'unique' in self.constraints:
             if node.value in self.unique:
@@ -95,7 +87,7 @@ class SchemaTextType(SchemaScalarType):
                 raise SchemaValidationError('pattern validation failed, value: "%s"' % node.value, node)
 
         if 'length' in self.constraints:
-            SchemaScalarType.check_range(self.constraints['length'], node, 'len("%s")' % node.value)
+            self.check_range(self.constraints['length'], node, 'len("%s")' % node.value)
 
         return node
 

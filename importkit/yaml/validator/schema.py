@@ -8,9 +8,9 @@
 
 from yaml import constructor as std_yaml_constructor
 
-from semantix.utils.lang.import_ import get_object
+from metamagic.utils.lang.import_ import get_object
 
-from semantix.utils.lang.yaml import constructor as yaml_constructor
+from metamagic.utils.lang.yaml import constructor as yaml_constructor
 from . import types, error
 
 

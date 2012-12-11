@@ -44,10 +44,10 @@ class MappingSequenceType(CompositeType):
         node.value = new_list
         self.mapping_type.end_checks()
 
-        if (node.tag.startswith('tag:semantix.sprymix.com,2009/semantix/class/derive:')
-                or node.tag.startswith('tag:semantix.sprymix.com,2009/semantix/object/create:')):
-            node.tags.append('tag:semantix.sprymix.com,2009/semantix/mapseq')
+        if (node.tag.startswith('tag:metamagic.sprymix.com,2009/metamagic/class/derive:')
+                or node.tag.startswith('tag:metamagic.sprymix.com,2009/metamagic/object/create:')):
+            node.tags.append('tag:metamagic.sprymix.com,2009/metamagic/mapseq')
         else:
-            self.push_tag(node, 'tag:semantix.sprymix.com,2009/semantix/mapseq')
+            self.push_tag(node, 'tag:metamagic.sprymix.com,2009/metamagic/mapseq')
 
         return node
