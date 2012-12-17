@@ -23,6 +23,9 @@ class ClassType(MappingType):
         super().load(dct)
 
     def check(self, node):
+        if self.check_tag(node, 'tag:yaml.org,2002:null'):
+            return node
+
         clsname = node.value[0][0].value
 
         try:
