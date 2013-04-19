@@ -17,9 +17,10 @@ from . import types, error
 class SimpleSchema:
     _schema_data = None
 
-    def __init__(self, schema_data=None):
+    def __init__(self, schema_data=None, *, namespace=None):
         self.refs = {}
         self.root = None
+        self.namespace = namespace
         if schema_data is None:
             schema_data = self.__class__._schema_data
         self._schema_data = schema_data
@@ -68,9 +69,12 @@ class SimpleSchema:
         tp.load(dct)
         return tp
 
+    def build_validators(self):
+        return self._build(self._schema_data)
+
     def check(self, node):
         if self.root is None:
-            self.root = self._build(self._schema_data)
+            self.root = self.build_validators()
 
         self.root.begin_checks()
         result = self.root.check(node)

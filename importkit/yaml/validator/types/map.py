@@ -83,6 +83,8 @@ class MappingType(CompositeType):
         keys = set()
 
         for i, (key, value) in enumerate(node.value):
+            subschema = self.get_subschema(key)
+
             if isinstance(key.value, list):
                 key.tag = 'tag:yaml.org,2002:python/tuple'
                 key.value = tuple(key.value)
@@ -102,9 +104,12 @@ class MappingType(CompositeType):
             if conf['required'] and value.value is None:
                 raise SchemaValidationError('None value for required key "%s"' % key, node)
 
-            conf['type'].begin_checks()
-            value = conf['type'].check(value)
-            conf['type'].end_checks()
+            if subschema is not None:
+                value = subschema.check(value)
+            else:
+                conf['type'].begin_checks()
+                value = conf['type'].check(value)
+                conf['type'].end_checks()
 
             if conf['unique']:
                 if value.value in self.unique[conf_key]:

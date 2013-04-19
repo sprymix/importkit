@@ -22,6 +22,16 @@ class SchemaType(object):
             if const in dct:
                 self.constraints[const] = dct[const]
 
+    def get_subschema(self, value):
+        from ..schema import Schema
+
+        if value.tag and self.schema.namespace:
+            subschema = self.schema.namespace.get(value.tag[1:])
+            if (subschema is not None and isinstance(subschema, type)
+                                      and issubclass(subschema, Schema)):
+                value.tag = 'tag:yaml.org,2002:str'
+                return subschema(namespace=self.schema.namespace)
+
     def load(self, dct):
         self.dct = dct
 
