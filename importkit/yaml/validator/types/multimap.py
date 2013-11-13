@@ -1,5 +1,5 @@
 ##
-# Copyright (c) 2012 Sprymix Inc.
+# Copyright (c) 2012-2013 Sprymix Inc.
 # All rights reserved.
 #
 # See LICENSE for details.
@@ -7,12 +7,17 @@
 
 
 import yaml
+import yaml.representer
 
 from .composite import CompositeType
 from ..error import SchemaValidationError
 
 
-class MappingSequenceType(CompositeType):
+class multimap(list):
+    pass
+
+
+class MultiMappingType(CompositeType):
     __slots__ = ['mapping_type']
 
     def __init__(self, schema):
@@ -46,8 +51,17 @@ class MappingSequenceType(CompositeType):
 
         if (node.tag.startswith('tag:metamagic.sprymix.com,2009/metamagic/class/derive:')
                 or node.tag.startswith('tag:metamagic.sprymix.com,2009/metamagic/object/create:')):
-            node.tags.append('tag:metamagic.sprymix.com,2009/metamagic/mapseq')
+            node.tags.append('tag:metamagic.sprymix.com,2009/metamagic/multimap')
         else:
-            self.push_tag(node, 'tag:metamagic.sprymix.com,2009/metamagic/mapseq')
+            self.push_tag(node, 'tag:metamagic.sprymix.com,2009/metamagic/multimap')
 
         return node
+
+
+class MultiMappingTypeRepresenter(yaml.representer.Representer):
+    def represent_multimap(self, data):
+        return self.represent_mapping('tag:metamagic.sprymix.com,2009/metamagic/multimap', data)
+
+
+yaml.representer.Representer.add_representer(multimap,
+        MultiMappingTypeRepresenter.represent_multimap)

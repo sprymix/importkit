@@ -59,8 +59,8 @@ class SimpleSchema:
             tp = types.ClassType(self)
         elif dct_type == 'none':
             tp = types.NoneType(self)
-        elif dct_type == 'mapseq':
-            tp = types.MappingSequenceType(self)
+        elif dct_type == 'multimap':
+            tp = types.MultiMappingType(self)
         else:
             raise error.SchemaError('unknown type: ' + dct_type)
 

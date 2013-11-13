@@ -11,7 +11,7 @@ from .any import AnyType
 from .choice import ChoiceType
 from .map import MappingType
 from .seq import SequenceType
-from .mapseq import MappingSequenceType
+from .multimap import MultiMappingType
 from .cls import ClassType
 
 from .scalars.base import ScalarType
