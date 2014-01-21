@@ -147,3 +147,7 @@ class Schema(SimpleSchema):
         schema = get_object(head + '.' + tail)
 
         return schema
+    
+    @classmethod
+    def get_tags(cls):
+        return {}

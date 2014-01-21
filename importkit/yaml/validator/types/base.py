@@ -10,10 +10,11 @@ import yaml
 
 
 class SchemaType(object):
-    __slots__ = ['schema', 'constraints', 'dct', 'resolver']
+    __slots__ = ['schema', 'schema_tags', 'constraints', 'dct', 'resolver']
 
     def __init__(self, schema):
         self.schema = schema
+        self.schema_tags = schema.get_tags()
         self.constraints = {}
         self.resolver = yaml.resolver.Resolver()
 
@@ -42,6 +43,14 @@ class SchemaType(object):
         pass
 
     def check(self, node):
+        node_tag = node.tag
+        tagdata = self.schema_tags.get(node_tag)
+        if tagdata is not None:
+            if tagdata[0]:
+                for tag in tagdata[0]:
+                    self.push_tag(node, tag)
+            self.push_tag(node, node_tag)
+
         if 'object' in self.dct:
             tag = 'tag:metamagic.sprymix.com,2009/metamagic/object/create:' + self.dct['object']
             self.push_tag(node, tag)

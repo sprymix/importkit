@@ -12,12 +12,11 @@ from .composite import CompositeType
 from ..error import SchemaValidationError
 
 class ChoiceType(CompositeType):
-    __slots__ = ['choice', 'checked']
+    __slots__ = 'choice',
 
     def __init__(self, schema):
         super().__init__(schema)
         self.choice = None
-        self.checked = {}
 
     def load(self, dct):
         super().load(dct)
@@ -26,23 +25,17 @@ class ChoiceType(CompositeType):
         for choice in dct['choice']:
             self.choice.append(self.schema._build(choice))
 
-
     def check(self, node):
         super().check(node)
 
-        """
-        did = id(node)
-        if did in self.checked:
-            return node
-        self.checked[did] = True
-        """
-
         errors = []
+
         tmp = None
 
         for choice in self.choice:
+            tmp = copy.deepcopy(node)
+
             try:
-                tmp = copy.deepcopy(node)
                 tmp = choice.check(tmp)
             except SchemaValidationError as error:
                 errors.append(str(error))
@@ -53,6 +46,6 @@ class ChoiceType(CompositeType):
 
         node.value = tmp.value
         node.tag = tmp.tag
-        node.tags = getattr(tmp, 'tags', None)
+        node.tags = getattr(tmp, 'tags', [])
 
         return node
