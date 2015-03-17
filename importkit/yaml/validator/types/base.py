@@ -10,7 +10,8 @@ import yaml
 
 
 class SchemaType(object):
-    __slots__ = ['schema', 'schema_tags', 'constraints', 'dct', 'resolver']
+    __slots__ = ['schema', 'schema_tags', 'constraints', 'dct', 'resolver',
+                 'checked_items']
 
     def __init__(self, schema):
         self.schema = schema
@@ -43,11 +44,16 @@ class SchemaType(object):
         pass
 
     def check(self, node):
+        if (self, node) in self.schema.checked_nodes:
+            return node
+
         node_tag = node.tag
         tagdata = self.schema_tags.get(node_tag)
+
         if tagdata is not None:
             if tagdata[0]:
-                for tag in tagdata[0]:
+                node.tag = tagdata[0][0]
+                for tag in tagdata[0][1:]:
                     self.push_tag(node, tag)
             self.push_tag(node, node_tag)
 
@@ -58,6 +64,7 @@ class SchemaType(object):
             tag = 'tag:metamagic.sprymix.com,2009/metamagic/class/derive:' + self.dct['class']
             self.push_tag(node, tag)
 
+        self.schema.checked_nodes.add((self, node))
         return node
 
     def is_bool(self, value):
@@ -97,6 +104,6 @@ class SchemaType(object):
             node.tags = [node.tag]
         else:
             node.tags.append(node.tag)
-        node.tag = tag
 
+        node.tag = tag
         return tag

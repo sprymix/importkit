@@ -24,6 +24,7 @@ class SimpleSchema:
         if schema_data is None:
             schema_data = self.__class__._schema_data
         self._schema_data = schema_data
+        self.checked_nodes = set()
 
     def _build(self, dct):
         dct_id = id(dct)
@@ -76,9 +77,13 @@ class SimpleSchema:
         if self.root is None:
             self.root = self.build_validators()
 
+        self.checked_nodes = set()
+
         self.root.begin_checks()
         result = self.root.check(node)
         self.root.end_checks()
+
+        self.checked_nodes.clear()
 
         return result
 
