@@ -16,10 +16,10 @@ except ImportError:
 
 from importlib import _bootstrap, util as importlib_util
 
-from metamagic.utils.lang import meta as lang_meta, loader as lang_loader
-from metamagic.utils.lang import runtimes as lang_runtimes
-from metamagic.utils.lang.import_ import utils as imputils
-from metamagic.utils.lang.import_ import loader as imploader
+from importkit import meta as lang_meta, loader as lang_loader
+from importkit import runtimes as lang_runtimes
+from importkit.import_ import utils as imputils
+from importkit.import_ import loader as imploader
 from . import utils as pyutils
 from ..import_ import cache as caches
 

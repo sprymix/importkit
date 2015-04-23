@@ -12,7 +12,7 @@ import sys
 
 
 def _get_file_loaders():
-    from metamagic.utils.lang.meta import LanguageMeta
+    from importkit.meta import LanguageMeta
 
     loader_details = list(_bootstrap._get_supported_file_loaders())
 
@@ -69,11 +69,11 @@ def install():
 
 
 def update_finders():
-    import metamagic
+    import importkit
 
     rpath = os.path.realpath
     loader_details = _get_file_loaders()
     for path, finder in list(sys.path_importer_cache.items()):
         if (isinstance(finder, FileFinder)
-                or any(rpath(path) == rpath(nspath) for nspath in list(metamagic.__path__))):
+                or any(rpath(path) == rpath(nspath) for nspath in list(importkit.__path__))):
             FileFinder.update_loaders(finder, loader_details, isinstance(finder, FileFinder))

@@ -7,47 +7,50 @@
 
 
 import importlib
+import unittest
 
-from metamagic.utils.debug import assert_raises
-from metamagic.utils.lang import context as lang_context
-from metamagic.utils.lang.yaml import exceptions as yaml_errors
-from metamagic import test
+from importkit import context as lang_context
+from importkit.yaml import exceptions as yaml_errors
 
 
-class TestLangImport(object):
+class TestLangImport(unittest.TestCase):
     def test_utils_lang_yaml_import(self):
-        modname = 'metamagic.utils.lang.yaml.tests.testdata.test_import'
+        modname = 'importkit.yaml.tests.testdata.test_import'
         mod = importlib.import_module(modname)
-        assert hasattr(mod, 'SimpleImport') and mod.SimpleImport['attr1'] == 'test'
+        self.assertTrue(
+            hasattr(mod, 'SimpleImport') and
+            mod.SimpleImport['attr1'] == 'test')
 
     def test_utils_lang_yaml_module_import(self):
-        modname = 'metamagic.utils.lang.yaml.tests.testdata.test_module_import'
+        modname = 'importkit.yaml.tests.testdata.test_module_import'
         mod = importlib.import_module(modname)
-        assert hasattr(mod, 'attr1') and hasattr(mod, 'attr2') and hasattr(mod, 'attr3')
+        self.assertTrue(
+            hasattr(mod, 'attr1') and hasattr(mod, 'attr2') and
+            hasattr(mod, 'attr3'))
 
     def test_utils_lang_yaml_module_import_bad1(self):
-        modname = 'metamagic.utils.lang.yaml.tests.testdata.test_module_import_bad1'
+        modname = 'importkit.yaml.tests.testdata.test_module_import_bad1'
         err = 'unexpected document after module-level schema document'
-        with assert_raises(yaml_errors.YAMLCompositionError, error_re=err):
+        with self.assertRaises(yaml_errors.YAMLCompositionError, msg=err):
             importlib.import_module(modname)
 
     def test_utils_lang_yaml_module_import_bad2(self):
-        modname = 'metamagic.utils.lang.yaml.tests.testdata.test_module_import_bad2'
+        modname = 'importkit.yaml.tests.testdata.test_module_import_bad2'
         err = 'unexpected module-level schema document'
-        with assert_raises(yaml_errors.YAMLCompositionError, error_re=err):
+        with self.assertRaises(yaml_errors.YAMLCompositionError, msg=err):
             importlib.import_module(modname)
 
-    @test.xfail
+    @unittest.expectedFailure
     def test_utils_lang_yaml_ambiguous_import(self):
-        with assert_raises(ImportError):
-            from metamagic.utils.lang.yaml.tests.testdata.ambig import test
+        with self.assertRaises(ImportError):
+            from importkit.yaml.tests.testdata.ambig import test
 
     def test_utils_lang_yaml_module_import_import(self):
-        modname = 'metamagic.utils.lang.yaml.tests.testdata.test_module_import_import'
+        modname = 'importkit.yaml.tests.testdata.test_module_import_import'
         importlib.import_module(modname)
 
     def test_utils_lang_yaml_moduleclass_tag(self):
-        modname = 'metamagic.utils.lang.yaml.tests.testdata.test_modclass_tag'
+        modname = 'importkit.yaml.tests.testdata.test_modclass_tag'
         mod = importlib.import_module(modname)
         from .testdata import modclass
-        assert isinstance(mod, modclass.CustomModuleClass)
+        self.assertTrue(isinstance(mod, modclass.CustomModuleClass))

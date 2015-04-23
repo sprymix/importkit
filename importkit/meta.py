@@ -16,8 +16,7 @@ import os
 import sys
 import types
 
-from metamagic.utils.algos import topological
-from metamagic.utils.functional import adapter
+from importkit.utils import adapter, topological
 
 from .exceptions import LanguageError
 from . import loader as lang_loader

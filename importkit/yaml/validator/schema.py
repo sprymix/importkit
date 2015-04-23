@@ -8,9 +8,9 @@
 
 from yaml import constructor as std_yaml_constructor
 
-from metamagic.utils.lang.import_ import get_object
+from importkit.import_ import get_object
 
-from metamagic.utils.lang.yaml import constructor as yaml_constructor
+from importkit.yaml import constructor as yaml_constructor
 from . import types, error
 
 
@@ -157,7 +157,7 @@ class Schema(SimpleSchema):
                 schema = getattr(schema, step)
 
         return schema
-    
+
     @classmethod
     def get_tags(cls):
         return {}

@@ -6,12 +6,13 @@
 ##
 
 
-from metamagic.utils.lang.yaml import validator
-from metamagic.utils.lang.yaml.validator.tests.base import SchemaTest, raises, result
+from importkit.yaml import validator
+from importkit.yaml.validator.tests.base import SchemaTest, raises, result
 
 
 class TestChoice(SchemaTest):
-    def __init__(self):
+    def setUp(self):
+        super().setUp()
         self.schema = self.get_schema('choice.Schema')
 
     @raises(validator.SchemaValidationError, 'Choice block errors')

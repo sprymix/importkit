@@ -6,11 +6,12 @@
 ##
 
 
-from metamagic.utils.lang.yaml.validator.tests.base import SchemaTest, raises
+from importkit.yaml.validator.tests.base import SchemaTest, raises
 
 
 class TestUnique(SchemaTest):
-    def __init__(self):
+    def setUp(self):
+        super().setUp()
         self.schema = self.get_schema('unique1.Schema')
 
     @raises(Exception, 'unique value "test" is already used')

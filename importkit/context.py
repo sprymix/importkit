@@ -10,7 +10,7 @@ import importlib
 import sys
 import types
 
-from metamagic.utils.datastructures import registry
+from importkit.utils import registry
 
 from .exceptions import UnresolvedError
 

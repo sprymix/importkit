@@ -15,10 +15,9 @@ import logging
 import sys
 import types
 
-from metamagic.utils.algos import topological
-from metamagic.utils.datastructures import OrderedSet
-from metamagic.utils.functional import adapter
-from metamagic.utils.lang.import_.loader import SourceLoader
+from importkit.utils import adapter, topological
+from importkit.utils.ordered import OrderedSet
+from importkit.import_.loader import SourceLoader
 
 from . import exceptions
 
@@ -91,7 +90,7 @@ class LanguageRuntimeMeta(type):
 
 
 class LanguageRuntime(metaclass=LanguageRuntimeMeta, abstract=True):
-    logger = logging.getLogger('metamagic.lang.runtime')
+    logger = logging.getLogger('importkit.runtime')
 
     @classmethod
     def new_derivative(cls, mod):

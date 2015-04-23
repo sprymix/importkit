@@ -10,12 +10,13 @@ import importlib
 import pickle
 import sys
 import types
+import unittest
 
-from metamagic.utils.lang.import_ import module as module_utils
-from metamagic.utils.lang.import_ import utils as import_utils
+from importkit.import_ import module as module_utils
+from importkit.import_ import utils as import_utils
 
 
-class TestLangImportModuleProxy:
+class TestLangImportModuleProxy(unittest.TestCase):
     def test_lang_import_module_light_proxy(self):
         mod = importlib.import_module(__package__ + '.testdata.proxiedmod')
         proxiedmod = module_utils.LightProxyModule(mod.__name__, mod)

@@ -8,11 +8,11 @@
 
 import yaml
 
-from metamagic.utils.lang.import_ import get_object, ObjectImportError
-from metamagic.utils.lang import context as lang_context
-from metamagic.utils.lang.yaml import constructor, parser
-from metamagic.utils.lang.yaml import exceptions as yaml_errors
-from metamagic.utils.lang.yaml import schema as yaml_schema
+from importkit.import_ import get_object, ObjectImportError
+from importkit import context as lang_context
+from importkit.yaml import constructor, parser
+from importkit.yaml import exceptions as yaml_errors
+from importkit.yaml import schema as yaml_schema
 
 
 class Loader(yaml.reader.Reader, parser.Scanner, parser.Parser, constructor.Composer,

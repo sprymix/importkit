@@ -6,8 +6,8 @@
 ##
 
 
-from metamagic.utils.lang.meta import Object
-from metamagic.utils.lang.yaml.validator.tests.base import SchemaTest, raises, result
+from importkit.meta import Object
+from importkit.yaml.validator.tests.base import SchemaTest, raises, result
 
 
 class A(Object):
@@ -24,7 +24,8 @@ class A(Object):
 
 
 class TestInheritance(SchemaTest):
-    def __init__(self):
+    def setUp(self):
+        super().setUp()
         self.schema = self.get_schema('inheritance.Schema')
 
     @result(expected_result=A(test1=1, test2='str2'))

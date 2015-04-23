@@ -10,12 +10,12 @@ import importlib
 import sys
 import yaml
 
-from metamagic.utils.lang import meta, context as lang_context, loader as lang_loader
-from metamagic.utils.lang.import_ import utils as import_utils
-from metamagic.utils.lang.yaml import loader, dumper, representer
-from metamagic.utils.lang.yaml import schema as yaml_schema
-from metamagic.utils.functional import Adapter
-from metamagic.utils.datastructures import OrderedSet
+from importkit import meta, context as lang_context, loader as lang_loader
+from importkit.import_ import utils as import_utils
+from importkit.yaml import loader, dumper, representer
+from importkit.yaml import schema as yaml_schema
+from importkit.utils.adapter import Adapter
+from importkit.utils.ordered import OrderedSet
 
 from . import types
 

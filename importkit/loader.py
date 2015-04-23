@@ -13,9 +13,9 @@ import marshal
 import os
 import sys
 
-from metamagic.utils.lang.import_ import loader
-from metamagic.utils.lang.import_ import module as module_types
-from metamagic.utils.lang.import_ import spec as module_spec
+from importkit.import_ import loader
+from importkit.import_ import module as module_types
+from importkit.import_ import spec as module_spec
 
 from .context import DocumentContext
 from . import exceptions as lang_errors

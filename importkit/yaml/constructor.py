@@ -15,9 +15,9 @@ import copy
 import types
 from string import Template
 
-from metamagic.utils.lang import meta as lang_base
-from metamagic.utils.lang import context as lang_context
-from metamagic.utils.lang.import_ import module as module_types, utils as module_utils
+from importkit import meta as lang_base
+from importkit import context as lang_context
+from importkit.import_ import module as module_types, utils as module_utils
 
 
 class ModuleTag(str):
@@ -279,7 +279,7 @@ class Constructor(yaml.constructor.Constructor):
         if not issubclass(cls, lang_base.Object):
             raise yaml.constructor.ConstructorError(
                     "while constructing a Python object", node.start_mark,
-                    "expected %s to be a subclass of metamagic.utils.lang.meta.Object" % classname, node.start_mark)
+                    "expected %s to be a subclass of importkit.meta.Object" % classname, node.start_mark)
 
         context = lang_context.SourceContext.from_object(node)
         if context is None:

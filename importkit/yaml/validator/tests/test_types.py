@@ -8,12 +8,13 @@
 
 import collections
 
-from metamagic.utils.lang.yaml import validator
-from metamagic.utils.lang.yaml.validator.tests.base import SchemaTest, raises, result
+from importkit.yaml import validator
+from importkit.yaml.validator.tests.base import SchemaTest, raises, result
 
 
 class TestTypes(SchemaTest):
-    def __init__(self):
+    def setUp(self):
+        super().setUp()
         self.schema = self.get_schema('types.Schema')
 
     @raises(validator.SchemaValidationError, 'expected none')

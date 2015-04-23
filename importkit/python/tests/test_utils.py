@@ -6,10 +6,12 @@
 ##
 
 
+import unittest
+
 from importkit.python import utils
 
 
-class TestUtilsLangPythonUtils:
+class TestUtilsLangPythonUtils(unittest.TestCase):
     def test_utils_lang_python_utils_get_top_level_imports(self):
         code = '''
 from ... import a, b
@@ -33,6 +35,7 @@ class A:
         code = compile(code, '', 'exec')
         imports = utils.get_top_level_imports(code)
 
-        assert imports == [('...', ('a', 'b')), ('...b.c', ('a',)),
-                           ('a.b', ('c',)), ('test.test.a', None),
-                           ('foo', None), ('bar', None)]
+        self.assertEqual(
+          imports, [('...', ('a', 'b')), ('...b.c', ('a',)),
+                            ('a.b', ('c',)), ('test.test.a', None),
+                            ('foo', None), ('bar', None)])

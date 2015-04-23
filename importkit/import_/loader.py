@@ -14,7 +14,7 @@ import pickle
 import struct
 import sys
 
-from metamagic.utils.debug import debug
+from importkit.utils.debug import debug
 
 from . import cache as caches
 from . import module as module_types
@@ -47,7 +47,7 @@ class LoaderIface:
 class LoaderCommon:
     @debug
     def load_module(self, fullname):
-        """LOG [lang.import.trace]
+        """LOG [importkit.trace]
         import time
 
         try:
@@ -63,7 +63,7 @@ class LoaderCommon:
 
         module = self._load_module_impl(fullname)
 
-        """LOG [lang.import.trace]
+        """LOG [importkit.trace]
         tdata['indent'] -= 1
         end = time.monotonic()
         full_time = end - start
@@ -82,7 +82,7 @@ class LoaderCommon:
 
     @debug
     def exec_module(self, module):
-        """LOG [lang.import.trace]
+        """LOG [importkit.trace]
         import time
 
         fullname = module.__name__
@@ -101,7 +101,7 @@ class LoaderCommon:
         # PEP 451 API
         module = self._init_module(module)
 
-        """LOG [lang.import.trace]
+        """LOG [importkit.trace]
         tdata['indent'] -= 1
         end = time.monotonic()
         full_time = end - start
@@ -308,7 +308,7 @@ class SourceLoader:
 # Global module cache signature.  Bump _GENERAL_VERSION on globally affecting
 # import system changes, such as changes to the cache structure.
 #
-_GENERAL_VERSION = 1
+_GENERAL_VERSION = 2
 _PYMAGIC = int.from_bytes(imp_utils.get_py_magic(), 'big')
 
 GENERAL_MAGIC = (0x4D4D << 48) | (_GENERAL_VERSION  << 32) | _PYMAGIC
@@ -441,9 +441,8 @@ class ModuleCache:
         self._code = self.unmarshal_code(self._code_bytes)
         return self._code
 
-    @debug
     def marshal_code(self, code):
-        """LOG [lang.import.cache.marshal]
+        """LOG [importkit.cache.marshal]
         from pickle import _Pickler
         import io
 
@@ -454,9 +453,8 @@ class ModuleCache:
 
         return pickle.dumps(code)
 
-    @debug
     def unmarshal_code(self, bytedata):
-        """LOG [lang.import.cache.unmarshal]
+        """LOG [importkit.cache.unmarshal]
         from pickle import _Unpickler
         import io
 
@@ -523,7 +521,6 @@ class ModuleCache:
             if code_bytes:
                 self._loader.set_data(code_path, code_bytes)
 
-    @debug
     def validate(self):
         metainfo = self.metainfo
 
@@ -533,9 +530,6 @@ class ModuleCache:
             pass
         else:
             if metainfo.magic != expected_magic:
-                """LOG [lang.import.cache]
-                print('import: cache: bad magic number in "{}" cache'.format(self._modname))
-                """
                 raise ImportError('bad magic number in "{}" cache'.format(self._modname))
 
         try:
@@ -548,9 +542,6 @@ class ModuleCache:
         cur_modver = self._loader._get_module_version(self._modname, metainfo)
 
         if cur_modver != metainfo.modver:
-            """LOG [lang.import.cache]
-            print('import: cache: modver mismatch in "{}" cache'.format(self._modname))
-            """
             raise ImportError('"{}" cache is stale'.format(self._modname))
 
     def update_module_attributes_early(self, module):

@@ -6,10 +6,10 @@
 ##
 
 
-%SCHEMA metamagic.utils.lang.yaml.schema.Schema
-%IMPORT metamagic.utils.lang.yaml.validator.tests.ymls.imported AS imported
+%SCHEMA importkit.yaml.schema.Schema
+%IMPORT importkit.yaml.validator.tests.ymls.imported AS imported
 %NAME Schema
 ---
 
 extends: imported.Common
-object: metamagic.utils.lang.yaml.validator.tests.test_inheritance.A
+object: importkit.yaml.validator.tests.test_inheritance.A

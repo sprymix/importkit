@@ -6,7 +6,7 @@
 ##
 
 
-from metamagic.utils.lang import meta as lang_meta
+from importkit import meta as lang_meta
 
 
 class YAMLError(lang_meta.LanguageError):

@@ -1,20 +1,23 @@
 ##
-# Copyright (c) 2008-2012 Sprymix Inc.
+# Copyright (c) 2008-2012, 2015 Sprymix Inc.
 # All rights reserved.
 #
 # See LICENSE for details.
 ##
 
 
-from metamagic.utils.lang.import_ import get_object
-from metamagic.utils.lang import context as lang_context
-from metamagic.utils.lang.yaml import constructor as yaml_constructor
-from metamagic.utils.lang.yaml import loader as yaml_loader
-from metamagic.utils.functional import decorate
+import functools
+import unittest
+
+from importkit.import_ import get_object
+from importkit import context as lang_context
+from importkit.yaml import constructor as yaml_constructor
+from importkit.yaml import loader as yaml_loader
 
 
 def raises(ex_cls, ex_msg):
     def dec(func):
+        @functools.wraps(func)
         def new(*args, **kwargs):
             slf = args[0]
 
@@ -29,13 +32,13 @@ def raises(ex_cls, ex_msg):
             else:
                 assert False, 'expected error "%s" got None instead' % ex_msg
 
-        decorate(new, func)
         return new
     return dec
 
 
 def result(expected_result=None, key=None, value=None):
     def dec(func):
+        @functools.wraps(func)
         def new(*args, **kwargs):
             slf = args[0]
 
@@ -54,14 +57,13 @@ def result(expected_result=None, key=None, value=None):
                     assert result[key] == value, \
                            'unexpected validation result %r, expected %r' % (result[key], value)
 
-        decorate(new, func)
         return new
     return dec
 
 
-class SchemaTest(object):
+class SchemaTest(unittest.TestCase):
     def load(self, str):
         return yaml_loader.Loader(str).get_single_node()
 
     def get_schema(self, clsname):
-        return get_object('metamagic.utils.lang.yaml.validator.tests.ymls.' + clsname)()
+        return get_object('importkit.yaml.validator.tests.ymls.' + clsname)()

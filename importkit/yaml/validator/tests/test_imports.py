@@ -6,11 +6,12 @@
 ##
 
 
-from metamagic.utils.lang.yaml.validator.tests.base import SchemaTest, raises, result
+from importkit.yaml.validator.tests.base import SchemaTest, raises, result
 
 
 class TestImports(SchemaTest):
-    def __init__(self):
+    def setUp(self):
+        super().setUp()
         self.schema = self.get_schema('imports.Schema')
 
     @result(expected_result={'test0': {'test1': 1, 'test2': 'str2'}, 'test3': '3'})

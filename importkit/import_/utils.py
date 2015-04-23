@@ -16,8 +16,7 @@ import types
 from importlib import util as imp_util
 from importlib.util import resolve_name as resolve_module_name
 
-from metamagic.utils.algos import topological
-from metamagic.utils.debug import debug
+from importkit.utils import topological
 
 from .context import ImportContext
 from . import cache as caches
@@ -260,7 +259,6 @@ def modified_modules():
             yield module
 
 
-@debug
 def reload_modified(modified=None):
     if modified is None:
         modified = modified_modules()
@@ -285,9 +283,6 @@ def reload_modified(modified=None):
             else:
                 raise
         else:
-            """LINE [lang.import.reload] RELOADED MODULE
-            module.__name__
-            """
             reloaded.append(module)
 
     return reloaded

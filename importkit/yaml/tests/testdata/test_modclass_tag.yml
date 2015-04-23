@@ -6,7 +6,7 @@
 ##
 
 
-!module metamagic.utils.lang.yaml.tests.testdata.modclass.CustomModuleClass
+!module importkit.yaml.tests.testdata.modclass.CustomModuleClass
 ...
 
 

@@ -6,8 +6,8 @@
 ##
 
 
-%SCHEMA metamagic.utils.lang.yaml.schema.Schema
-%IMPORT metamagic.utils.lang.yaml.validator.tests.ymls.imported AS imported
+%SCHEMA importkit.yaml.schema.Schema
+%IMPORT importkit.yaml.validator.tests.ymls.imported AS imported
 %NAME Schema
 ---
 

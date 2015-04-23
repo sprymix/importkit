@@ -6,7 +6,7 @@
 ##
 
 
-from metamagic.bootstrap.yaml.validator import types as v_types
+from . import types as v_types
 from . import validator
 
 

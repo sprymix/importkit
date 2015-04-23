@@ -7,4 +7,4 @@
 
 
 # Import languages to register them
-from metamagic.utils.lang import yaml, python, javascript, jplus
+from importkit import yaml, python

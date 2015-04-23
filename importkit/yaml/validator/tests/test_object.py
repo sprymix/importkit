@@ -8,9 +8,9 @@
 
 import yaml
 
-from metamagic.utils.lang.meta import Object, ObjectError
-from metamagic.utils.lang.yaml import validator
-from metamagic.utils.lang.yaml.validator.tests.base import SchemaTest, result, raises
+from importkit.meta import Object, ObjectError
+from importkit.yaml import validator
+from importkit.yaml.validator.tests.base import SchemaTest, result, raises
 
 
 class A(Object):
@@ -68,7 +68,8 @@ class CustomValidator(Object):
 
 
 class TestObject(SchemaTest):
-    def __init__(self):
+    def setUp(self):
+        super().setUp()
         self.schema = self.get_schema('object.Schema')
 
     @result(key='test1', value=A(name='testname', description='testdescription'))
@@ -98,7 +99,7 @@ class TestObject(SchemaTest):
     def test_validator_object_class_type(self):
         """
         classtype:
-            metamagic.utils.lang.yaml.validator.tests.test_object.A:
+            importkit.yaml.validator.tests.test_object.A:
                 name: a
                 description: b
         """
@@ -107,7 +108,7 @@ class TestObject(SchemaTest):
     def test_validator_object_class_type_validation(self):
         """
         classtype:
-            metamagic.utils.lang.yaml.validator.tests.test_object.A:
+            importkit.yaml.validator.tests.test_object.A:
                 name: a
                 description: b
                 customfield: 21
