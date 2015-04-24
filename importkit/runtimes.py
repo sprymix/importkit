@@ -524,7 +524,7 @@ def get_compatible_runtimes(module, tags=None, consider_derivatives=False,
 def runtimes_compatible(runtimes1, runtimes2):
     """Check if a set of runtimes is satisfied by another set"""
 
-    if not runtimes1:
+    if not runtimes1 or not runtimes2:
         return True
 
     runtimes2 = {c for r2 in runtimes2 for c in r2.__mro__
