@@ -42,7 +42,7 @@ class ModuleSchemaBase(Base):
 class NamespaceModuleSchemaBase(ModuleSchemaBase):
     def check(self, node):
         node = super().check(node)
-        node.tag = 'tag:metamagic.sprymix.com,2009/metamagic/schema/namespace'
+        node.tag = 'tag:importkit.magic.io,2009/importkit/schema/namespace'
         return node
 
 
@@ -54,7 +54,7 @@ class Schema(Base):
             node.tags = [node.tag]
         else:
             node.tags.append(node.tag)
-        tag = 'tag:metamagic.sprymix.com,2009/metamagic/class/derive:{}.{}'
+        tag = 'tag:importkit.magic.io,2009/importkit/class/derive:{}.{}'
         node.tag = tag.format(self._schema_base_cls.__module__, self._schema_base_cls.__name__)
         return node
 

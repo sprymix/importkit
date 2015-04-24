@@ -220,8 +220,8 @@ class Constructor(yaml.constructor.Constructor):
         return context
 
     def _is_object_or_class(self, node):
-        return node.tag.startswith('tag:metamagic.sprymix.com,2009/metamagic/class/derive:') or \
-               node.tag.startswith('tag:metamagic.sprymix.com,2009/metamagic/object/create:')
+        return node.tag.startswith('tag:importkit.magic.io,2009/importkit/class/derive:') or \
+               node.tag.startswith('tag:importkit.magic.io,2009/importkit/object/create:')
 
     def constructor_context(self, yaml_constructors):
         return ConstructorContext(self, yaml_constructors)
@@ -396,37 +396,37 @@ class Constructor(yaml.constructor.Constructor):
 
 
 Constructor.add_multi_constructor(
-    'tag:metamagic.sprymix.com,2009/metamagic/class/derive:',
+    'tag:importkit.magic.io,2009/importkit/class/derive:',
     Constructor.construct_python_class
 )
 
 Constructor.add_multi_constructor(
-    'tag:metamagic.sprymix.com,2009/metamagic/object/create:',
+    'tag:importkit.magic.io,2009/importkit/object/create:',
     Constructor.construct_python_object
 )
 
 Constructor.add_constructor(
-    'tag:metamagic.sprymix.com,2009/metamagic/orderedmap',
+    'tag:importkit.magic.io,2009/importkit/orderedmap',
     Constructor.construct_ordered_map
 )
 
 Constructor.add_constructor(
-    'tag:metamagic.sprymix.com,2009/metamagic/multimap',
+    'tag:importkit.magic.io,2009/importkit/multimap',
     Constructor.construct_multimap
 )
 
 Constructor.add_constructor(
-    'tag:metamagic.sprymix.com,2009/metamagic/frozenset',
+    'tag:importkit.magic.io,2009/importkit/frozenset',
     Constructor.construct_frozenset
 )
 
 Constructor.add_constructor(
-    'tag:metamagic.sprymix.com,2009/metamagic/decimal',
+    'tag:importkit.magic.io,2009/importkit/decimal',
     Constructor.construct_decimal
 )
 
 Constructor.add_constructor(
-    'tag:metamagic.sprymix.com,2009/metamagic/schema/namespace',
+    'tag:importkit.magic.io,2009/importkit/schema/namespace',
     Constructor.construct_namespace_map
 )
 

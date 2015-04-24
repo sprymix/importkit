@@ -43,7 +43,7 @@ class ClassType(MappingType):
 
         clsdict = node.value[0][1]
 
-        tag = 'tag:metamagic.sprymix.com,2009/metamagic/object/create:%s' % clsname
+        tag = 'tag:importkit.magic.io,2009/importkit/object/create:%s' % clsname
         self.push_tag(clsdict, tag)
 
         return clsdict

@@ -142,6 +142,6 @@ class MappingType(CompositeType):
                         node.value.append((k, v))
 
         if self.ordered:
-            self.push_tag(node, 'tag:metamagic.sprymix.com,2009/metamagic/orderedmap')
+            self.push_tag(node, 'tag:importkit.magic.io,2009/importkit/orderedmap')
 
         return node

@@ -49,18 +49,18 @@ class MultiMappingType(CompositeType):
         node.value = new_list
         self.mapping_type.end_checks()
 
-        if (node.tag.startswith('tag:metamagic.sprymix.com,2009/metamagic/class/derive:')
-                or node.tag.startswith('tag:metamagic.sprymix.com,2009/metamagic/object/create:')):
-            node.tags.append('tag:metamagic.sprymix.com,2009/metamagic/multimap')
+        if (node.tag.startswith('tag:importkit.magic.io,2009/importkit/class/derive:')
+                or node.tag.startswith('tag:importkit.magic.io,2009/importkit/object/create:')):
+            node.tags.append('tag:importkit.magic.io,2009/importkit/multimap')
         else:
-            self.push_tag(node, 'tag:metamagic.sprymix.com,2009/metamagic/multimap')
+            self.push_tag(node, 'tag:importkit.magic.io,2009/importkit/multimap')
 
         return node
 
 
 class MultiMappingTypeRepresenter(yaml.representer.Representer):
     def represent_multimap(self, data):
-        return self.represent_mapping('tag:metamagic.sprymix.com,2009/metamagic/multimap', data)
+        return self.represent_mapping('tag:importkit.magic.io,2009/importkit/multimap', data)
 
 
 yaml.representer.Representer.add_representer(multimap,

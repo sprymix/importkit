@@ -58,10 +58,10 @@ class SchemaType(object):
             self.push_tag(node, node_tag)
 
         if 'object' in self.dct:
-            tag = 'tag:metamagic.sprymix.com,2009/metamagic/object/create:' + self.dct['object']
+            tag = 'tag:importkit.magic.io,2009/importkit/object/create:' + self.dct['object']
             self.push_tag(node, tag)
         elif 'class' in self.dct:
-            tag = 'tag:metamagic.sprymix.com,2009/metamagic/class/derive:' + self.dct['class']
+            tag = 'tag:importkit.magic.io,2009/importkit/class/derive:' + self.dct['class']
             self.push_tag(node, tag)
 
         self.schema.checked_nodes.add((self, node))
