@@ -32,7 +32,7 @@ setup_args = {
     'long_description': readme,
     'maintainer':       'Sprymix Inc.',
     'maintainer_email': 'into@sprymix.com',
-    'url':              'http://sprymix.com',
+    'url':              'https://github.com/sprymix/importkit',
     'platforms':        ['any'],
     'ext_modules':      [],
 
