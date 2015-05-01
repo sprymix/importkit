@@ -68,12 +68,33 @@ def install():
         sys.path_hooks.insert(0, FileFinder.path_hook())
 
 
-def update_finders():
-    import importkit
+_packages = set()
 
-    rpath = os.path.realpath
+
+def update_finders():
     loader_details = _get_file_loaders()
     for path, finder in list(sys.path_importer_cache.items()):
-        if (isinstance(finder, FileFinder)
-                or any(rpath(path) == rpath(nspath) for nspath in list(importkit.__path__))):
-            FileFinder.update_loaders(finder, loader_details, isinstance(finder, FileFinder))
+        if isinstance(finder, FileFinder) or is_importkit_path(path):
+            FileFinder.update_loaders(finder, loader_details,
+                                      isinstance(finder, FileFinder))
+
+
+def register_package(package_name):
+    global _packages
+
+    _packages.add(package_name)
+
+
+def is_importkit_path(path):
+    rpath = os.path.realpath
+
+    for pkgname in _packages:
+        pkg = sys.modules.get(pkgname)
+        if pkg:
+            if any(rpath(path) == rpath(nspath) for nspath in pkg.__path__):
+                return True
+    else:
+        return False
+
+
+register_package('importkit')

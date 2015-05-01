@@ -7,7 +7,7 @@
 
 
 from .meta import LanguageMeta
-from .import_ import ImportContext, install
+from .import_ import ImportContext, install, register_package
 
 
 class MetamagicLangLoaderError(Exception):

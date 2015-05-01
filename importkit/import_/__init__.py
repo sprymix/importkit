@@ -13,7 +13,7 @@ import sys
 
 from .context import ImportContext
 
-from .finder import install, update_finders
+from .finder import install, update_finders, register_package
 
 
 class ObjectImportError(Exception):
