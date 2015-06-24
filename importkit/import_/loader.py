@@ -441,6 +441,7 @@ class ModuleCache:
         self._code = self.unmarshal_code(self._code_bytes)
         return self._code
 
+    @debug
     def marshal_code(self, code):
         """LOG [importkit.cache.marshal]
         from pickle import _Pickler
@@ -453,6 +454,7 @@ class ModuleCache:
 
         return pickle.dumps(code)
 
+    @debug
     def unmarshal_code(self, bytedata):
         """LOG [importkit.cache.unmarshal]
         from pickle import _Unpickler
@@ -552,6 +554,7 @@ class ModuleCache:
 
 
 class CachingLoader:
+    @debug
     def get_code(self, modname):
         cache = self.create_cache(modname)
         code = None
@@ -572,6 +575,11 @@ class CachingLoader:
                     pass
 
         if code is None:
+            """LOG [importkit.cache.miss]
+            if cache is not None:
+                print('CACHE MISS: ' + modname)
+            """
+
             source_bytes = self.get_source_bytes(modname)
             code = self.code_from_source(modname, source_bytes, cache=cache)
 
