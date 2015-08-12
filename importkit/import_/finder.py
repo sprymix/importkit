@@ -6,7 +6,16 @@
 ##
 
 
-from importlib import machinery, _bootstrap
+from importlib import machinery
+
+from importlib import _bootstrap
+
+try:
+    from importlib import _bootstrap_external
+except ImportError:
+    from importlib import _bootstrap as _bootstrap_external
+
+
 import os
 import sys
 
@@ -14,7 +23,7 @@ import sys
 def _get_file_loaders():
     from importkit.meta import LanguageMeta
 
-    loader_details = list(_bootstrap._get_supported_file_loaders())
+    loader_details = list(_bootstrap_external._get_supported_file_loaders())
 
     lang_loaders = list(LanguageMeta.get_loaders())
     ext_map = {}
