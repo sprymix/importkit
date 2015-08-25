@@ -26,7 +26,7 @@ def find_packages(*roots):
 
 setup_args = {
     'name':             'importkit',
-    'version':          '0.5.0',
+    'version':          '0.5.1',
     'description':      ('Importkit is a Python library for making anything '
                          'importable as a Python module.'),
     'long_description': readme,
