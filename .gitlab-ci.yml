@@ -1,0 +1,17 @@
+image:
+  sprymix/python:latest
+
+variables:
+  WORKON_HOME: /var/lib/venvs
+
+build:
+  only:
+    - master
+
+  script:
+    - apt-get update && apt-get install -y nodejs
+    - mkdir -p /var/lib/venvs
+    - pip install vex
+    - vex -m test pip install --upgrade pip
+    - vex test pip install --extra-index-url https://pypi.sprymix.net/simple/ --allow-all-external .
+    - vex test python3 -u -m importkit.tests
