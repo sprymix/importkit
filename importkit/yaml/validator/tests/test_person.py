@@ -51,8 +51,8 @@ class TestPerson(SchemaTest):
           sex: unknown
         """
 
-    @raises(validator.SchemaValidationError, 'unique key "name", value "Anya" is already used')
-    def test_validator_unique(self):
+    @raises(validator.SchemaValidationError, "unique key 'name', value 'Anya' is already used")
+    def test_validator_unique_value(self):
         """
         - name: "Anya"
           phone: 416-509-2801

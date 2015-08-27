@@ -131,7 +131,7 @@ class TestTypes(SchemaTest):
         dict: 'WRONG'
         """
 
-    @raises(validator.SchemaValidationError, 'unexpected key "wrongkey"')
+    @raises(validator.SchemaValidationError, "unexpected key 'wrongkey'")
     def test_validator_types_map_fail2(self):
         """
         dict:
@@ -169,7 +169,7 @@ class TestTypes(SchemaTest):
             b: "2"
         """
 
-    @raises(validator.SchemaValidationError, 'duplicate mapping key "A"')
+    @raises(validator.SchemaValidationError, "duplicate mapping key 'A'")
     def test_validator_types_map_duplicate_key_check(self):
         """
         fdict:
@@ -183,6 +183,21 @@ class TestTypes(SchemaTest):
         fdict:
             a: "1"
             [b, c]: "2"
+        """
+
+    @result(key='redict', value={'UPPERCASE': 10, 'lowercase': '10', '12345': True})
+    def test_validator_type_map_pattern_key_ok(self):
+        """
+        redict:
+            UPPERCASE: 10
+            lowercase: '10'
+        """
+
+    @raises(validator.SchemaValidationError, "unexpected key '1'")
+    def test_validator_type_map_pattern_key_fail(self):
+        """
+        redict:
+            1: 10
         """
 
     @result(key='minmax', value=3)

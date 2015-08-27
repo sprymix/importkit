@@ -14,7 +14,7 @@ class TestUnique(SchemaTest):
         super().setUp()
         self.schema = self.get_schema('unique1.Schema')
 
-    @raises(Exception, 'unique value "test" is already used')
+    @raises(Exception, "unique value 'test' is already used")
     def test_validator_unique_map_key(self):
         """
         test1:
@@ -22,7 +22,7 @@ class TestUnique(SchemaTest):
             - test
         """
 
-    @raises(Exception, 'unique value "2" is already used')
+    @raises(Exception, "unique value '2' is already used")
     def test_validator_unique_map_key2(self):
         """
         test1:

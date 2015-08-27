@@ -37,7 +37,7 @@ class ClassType(MappingType):
         if hasattr(cls, 'get_yaml_validator_config'):
             config = cls.get_yaml_validator_config()
             if config:
-                self.keys['=']['type'].load_keys(config)
+                next(iter(self.keys.values()))['type'].load_keys(config)
 
         node = super().check(node)
 

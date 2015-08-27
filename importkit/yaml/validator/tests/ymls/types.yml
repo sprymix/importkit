@@ -38,6 +38,17 @@ mapping:
             =:
                 type: str
 
+    redict:
+        type: map
+        mapping:
+            "/[A-Z]/":
+                type: int
+            "/[a-z]/":
+                type: str
+            "12345":
+                type: bool
+                default: True
+
     minmax:
         type: int
         range: {min: 3, max-ex: 20}

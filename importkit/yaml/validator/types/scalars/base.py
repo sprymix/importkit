@@ -67,8 +67,9 @@ class SchemaScalarType(SchemaType):
 
         if 'unique' in self.constraints:
             if node.value in self.unique:
-                raise SchemaValidationError('unique value "%s" is already used in %s' %
-                                            (node.value, self.unique[node.value]), node)
+                msg = 'unique value {!r} is already used in {!r}'.format(
+                            node.value, self.unique[node.value])
+                raise SchemaValidationError(msg, node)
 
             self.unique[node.value] = node
 

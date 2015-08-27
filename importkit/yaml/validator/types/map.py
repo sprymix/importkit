@@ -1,5 +1,5 @@
 ##
-# Copyright (c) 2008-2010 Sprymix Inc.
+# Copyright (c) 2008-2010, 2015 Sprymix Inc.
 # All rights reserved.
 #
 # See LICENSE for details.
@@ -8,17 +8,50 @@
 
 import collections
 import copy
+import re
 import yaml
 
 from .composite import CompositeType
 from ..error import SchemaValidationError
 
+
+class AnyValue:
+    def match(self, value):
+        return True
+
+    def __repr__(self):
+        return '<any value>'
+
+    @property
+    def pattern(self):
+        return '='
+
+
+class RegExp:
+    def __init__(self, pattern):
+        self._re = re.compile(pattern)
+
+    def match(self, value):
+        if isinstance(value, str):
+            return self._re.match(value)
+        else:
+            return False
+
+    def __repr__(self):
+        return repr(self._re)
+
+    @property
+    def pattern(self):
+        return self._re.pattern
+
+
 class MappingType(CompositeType):
-    __slots__ = ['keys', 'unique_base', 'unique', 'ordered']
+    __slots__ = ['keys', 'key_res', 'unique_base', 'unique', 'ordered']
 
     def __init__(self, schema):
         super().__init__(schema)
         self.keys = collections.OrderedDict()
+        self.key_res = []
 
         self.unique_base = {}
         self.unique = None
@@ -28,11 +61,18 @@ class MappingType(CompositeType):
 
     def load_keys(self, keys):
         for key, value in keys.items():
+            if key == '=':
+                key = AnyValue()
+                self.key_res.append(key)
+            elif key.startswith('/') and key.endswith('/'):
+                key = RegExp(key[1:-1])
+                self.key_res.append(key)
+
             self.keys[key] = {}
 
             if isinstance(value, dict):
-                self.keys[key]['required'] = 'required' in value and value['required']
-                self.keys[key]['unique'] = 'unique' in value and value['unique']
+                self.keys[key]['required'] = bool(value.get('required'))
+                self.keys[key]['unique'] = bool(value.get('unique'))
 
                 if self.keys[key]['unique']:
                     self.unique_base[key] = {}
@@ -60,25 +100,31 @@ class MappingType(CompositeType):
         super(MappingType, self).end_checks()
         self.unique = None
 
+    def _match_key(self, key_value):
+        conf = None
+
+        try:
+            conf = self.keys[key_value]
+        except KeyError:
+            for key_re in self.key_res:
+                if key_re.match(key_value):
+                    conf = self.keys[key_re]
+                    key_value = key_re.pattern
+
+        return key_value, conf
+
     def check(self, node):
         node = super().check(node)
 
-        """ XXX:
-        did = id(data)
-        if did in self.checked:
-            return data
-        self.checked[did] = True
-        """
-
         if node.tag == 'tag:yaml.org,2002:null':
-            node = yaml.nodes.MappingNode(tag='tag:yaml.org,2002:map', value=[],
-                                          start_mark=node.start_mark, end_mark=node.end_mark)
+            node = yaml.nodes.MappingNode(tag='tag:yaml.org,2002:map',
+                                          value=[],
+                                          start_mark=node.start_mark,
+                                          end_mark=node.end_mark)
         elif not isinstance(node, yaml.nodes.MappingNode):
             raise SchemaValidationError('mapping expected', node)
 
         self.check_constraints(node)
-
-        any = '=' in self.keys
 
         keys = set()
 
@@ -88,21 +134,23 @@ class MappingType(CompositeType):
             if isinstance(key.value, list):
                 key.tag = 'tag:yaml.org,2002:python/tuple'
                 key.value = tuple(key.value)
-
-            if key.value in keys:
-                raise SchemaValidationError('duplicate mapping key "%s"' % key.value, node)
-
-            conf_key = key.value
-            if key.value in self.keys:
-                conf = self.keys[key.value]
-            elif any:
-                conf_key = '='
-                conf = self.keys['=']
+                key_value = tuple(v.value for v in key.value)
             else:
-                raise SchemaValidationError('unexpected key "%s"' % key.value, node)
+                key_value = key.value
+
+            if key_value in keys:
+                err = 'duplicate mapping key {!r}'.format(key_value)
+                raise SchemaValidationError(err, node)
+
+            conf_key, conf = self._match_key(key_value)
+
+            if conf is None:
+                err = 'unexpected key {!r}'.format(key_value)
+                raise SchemaValidationError(err, node)
 
             if conf['required'] and value.value is None:
-                raise SchemaValidationError('None value for required key "%s"' % key, node)
+                err = 'None value for required key {!r}'.format(key_value)
+                raise SchemaValidationError(err, node)
 
             if subschema is not None:
                 value = subschema.check(value)
@@ -113,8 +161,10 @@ class MappingType(CompositeType):
 
             if conf['unique']:
                 if value.value in self.unique[conf_key]:
-                    raise SchemaValidationError('unique key "%s", value "%s" is already used in %s' %
-                                                (key.value, value.value, self.unique[conf_key][value.value]))
+                    err = 'unique key {!r}, value {!r} is already used in {!r}'
+                    err = err.format(key_value, value.value,
+                                     self.unique[conf_key][value.value])
+                    raise SchemaValidationError(err, node)
 
                 self.unique[conf_key][value.value] = value
 
@@ -124,24 +174,31 @@ class MappingType(CompositeType):
         value = {key.value: (key, value) for key, value in node.value}
 
         for key, conf in self.keys.items():
-            if key == '=':
+            if hasattr(key, 'match'):
+                # Skip RE keys
                 continue
 
             if key not in value:
                 if 'default' in conf:
-                    key = yaml.nodes.ScalarNode(value=key, tag='tag:yaml.org,2002:str')
-                    default = self.coerse_value(conf['type'], conf['default'], node)
+                    key = yaml.nodes.ScalarNode(
+                                value=key, tag='tag:yaml.org,2002:str')
+                    default = self.coerse_value(
+                                conf['type'], conf['default'], node)
                     node.value.append((key, default))
 
                 else:
                     if conf['required']:
-                        raise SchemaValidationError('key "%s" is required' % key, node)
+                        err = 'key {!r} is required'.format(key)
+                        raise SchemaValidationError(err, node)
                     else:
-                        k = yaml.nodes.ScalarNode(value=key, tag='tag:yaml.org,2002:str')
-                        v = yaml.nodes.ScalarNode(value=None, tag='tag:yaml.org,2002:null')
+                        k = yaml.nodes.ScalarNode(
+                                value=key, tag='tag:yaml.org,2002:str')
+                        v = yaml.nodes.ScalarNode(
+                                value=None, tag='tag:yaml.org,2002:null')
                         node.value.append((k, v))
 
         if self.ordered:
-            self.push_tag(node, 'tag:importkit.magic.io,2009/importkit/orderedmap')
+            self.push_tag(
+                node, 'tag:importkit.magic.io,2009/importkit/orderedmap')
 
         return node
