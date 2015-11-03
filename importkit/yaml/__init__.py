@@ -305,4 +305,8 @@ class ObjectMeta(Adapter):
 class Object(meta.Object, metaclass=ObjectMeta):
     @classmethod
     def represent_wrapper(cls, dumper, data):
-        return dumper.represent_data(cls.__sx_getstate__(data))
+        data = cls.__sx_getstate__(data)
+        if not isinstance(data, yaml.Node):
+            return dumper.represent_data(data)
+        else:
+            return data
