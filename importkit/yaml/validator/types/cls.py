@@ -17,7 +17,18 @@ class ClassType(MappingType):
         super().__init__(schema)
 
     def load(self, dct):
-        dct['mapping'] = {'=': {'type': 'map', 'required': True, 'mapping': dct['fields']}}
+        fallback = dct.get('fallback')
+        if fallback:
+            try:
+                mod, _, name = fallback.rpartition('.')
+                self.fallback = getattr(importlib.import_module(mod), name)
+                self.fallback_name = fallback
+            except (ImportError, AttributeError):
+                raise SchemaValidationError(
+                        'could not find class %s' % fallback)
+
+        dct['mapping'] = {'=': {'type': 'map', 'required': True,
+                                'mapping': dct['fields']}}
         dct['min-length'] = 1
         dct['max-length'] = 1
         super().load(dct)
@@ -32,7 +43,12 @@ class ClassType(MappingType):
             mod, _, name = clsname.rpartition('.')
             cls = getattr(importlib.import_module(mod), name)
         except (ImportError, AttributeError):
-            raise SchemaValidationError('could not find class %s' % clsname, node)
+            if self.fallback:
+                cls = self.fallback
+                clsname = self.fallback_name
+            else:
+                raise SchemaValidationError(
+                        'could not find class %s' % clsname, node)
 
         if hasattr(cls, 'get_yaml_validator_config'):
             config = cls.get_yaml_validator_config()
