@@ -81,6 +81,10 @@ class Loader(lang_loader.LanguageSourceFileLoader):
         return YAMLModuleCache(modname, self)
 
 
+class BufferLoader(lang_loader.LanguageSourceBufferLoader):
+    pass
+
+
 class Language(meta.Language):
     file_extensions = ('yml',)
     loader = Loader
@@ -200,7 +204,9 @@ class Language(meta.Language):
         else:
             pkg = context.module.__package__
 
-        all_imports = getmods(pkg, list(imports.items()))
+        all_imports = []
+        if imports:
+            all_imports.extend(getmods(pkg, list(imports.items())))
         # Add schemas as imports
         all_imports.extend(schema_mods)
         all_imports.sort()
