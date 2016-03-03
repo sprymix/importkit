@@ -62,6 +62,7 @@ class Composer(yaml.composer.Composer):
 
         if self.document_context is not None:
             self.document_context.document_name = node.document_name
+            self.document_context.schema = schema
 
         self.get_event()
         self.anchors = {}
