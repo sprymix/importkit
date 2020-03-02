@@ -7,12 +7,15 @@
 
 
 import marshal
-import os
 import sys
 try:
     from importlib._bootstrap import _SourceFileLoader
 except ImportError:
-    from importlib._bootstrap import SourceFileLoader as _SourceFileLoader
+    try:
+        from importlib._bootstrap import SourceFileLoader as _SourceFileLoader
+    except ImportError:
+        from importlib._bootstrap_external import SourceFileLoader \
+            as _SourceFileLoader
 
 from importlib import _bootstrap, util as importlib_util
 
